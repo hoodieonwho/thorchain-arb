@@ -36,7 +36,8 @@ class ThorOracle:
         self.thorNode_node = thornode_client.NodesApi()
         self.thorNode_pool = thornode_client.PoolsApi()
         self.thorNode_tx = thornode_client.TxApi()
-        self.num_seeding = 3
+        self.thorNode_vault = thornode_client.VaultsApi()
+        self.num_seeding = 1
         self.num_depth = 3
         self.host = host
         if host:
@@ -110,7 +111,7 @@ class ThorOracle:
                 self.inbound_addresses = node_active_consensus[0]
                 return seeds_active
 
-    def get_inbound_addresses(self, cache_time=60.0):
+    def get_inbound_addresses(self, cache_time=600.0):
         """Return cached ⌈2/3⌉ proofed inbound addresses and reload seeds"""
         delta = datetime.utcnow() - self.seed_time
         if delta.total_seconds() >= cache_time:
@@ -148,7 +149,7 @@ class ThorOracle:
         else:
             return depths[0]
 
-    def get_depth(self, cache_time=5.0):
+    def get_depth(self, cache_time=5.0, chain=None, assets=None):
         """Return cached pool_depth proofed by num_depth nodes"""
         delta = datetime.utcnow() - self.depth_time
         if delta.total_seconds() >= cache_time:
@@ -158,7 +159,15 @@ class ThorOracle:
                 if self.depths:
                     self.depth_time = datetime.utcnow()
                     break
-        return self.depths
+        if chain:
+            depth = list(filter(lambda pool: pool["asset"].split('.')[0] == chain, self.depths))
+            if assets:
+                depth = list(filter(lambda pool: pool["asset"].split('.')[1] in assets, depth))
+        else:
+            depth = self.depths
+            if assets:
+                depth = list(filter(lambda pool: pool["asset"].split('.')[1] in assets, depth))
+        return depth
 
     def get_swap_output(self, in_amount, in_asset, out_asset):
         pool_depths = self.get_depth()
