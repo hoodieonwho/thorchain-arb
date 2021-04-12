@@ -1,0 +1,8 @@
+env/
+debug*
+.idea/
+__pycache__/
+secret/
+.pytest_cache/
+tox.ini
+.travis.yml
