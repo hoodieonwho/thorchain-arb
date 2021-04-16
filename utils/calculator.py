@@ -28,3 +28,14 @@ def slip(inputAmount, inputDepth, outputDepth):
     slip = inputAmount ** 2 * outputDepth / (inputAmount + inputDepth) ** 2
     return slip
 
+
+def amm_output(i_amount, i_depth, o_depth):
+    return i_amount * i_depth * o_depth / (i_amount + i_depth) ** 2
+    # outbound fee
+
+
+def doubleswap_output(input_amount, pool1_data, pool2_data):
+    swap1_out = amm_output(input_amount, int(pool1_data["balance_asset"]), int(pool1_data["balance_rune"]))
+    swap2_out = amm_output(swap1_out, int(pool2_data["balance_rune"]), int(pool2_data["balance_asset"]))
+    return swap2_out
+    # outbound fee

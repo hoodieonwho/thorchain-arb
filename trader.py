@@ -6,6 +6,7 @@ from ccxt.base.decimal_to_precision import TRUNCATE
 from collections import defaultdict
 from xchainpy_util.asset import Asset
 
+
 class FTXTrader:
     def __init__(self):
         self.account = Account()

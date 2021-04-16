@@ -47,7 +47,7 @@ offset = 789 # int | pagination offset
 address = 'address_example' # str | Comma separated list. Address of sender or recipient of any in/out transaction related to the action.  (optional)
 txid = 'txid_example' # str | ID of any in/out tx related to the action (optional)
 asset = 'asset_example' # str | Any asset that is part of the action (CHAIN.SYMBOL) (optional)
-type = 'type_example' # str | One or more comma separated unique types of action (swap, addLiquidity, withdraw, donate, refund) (optional)
+type = 'type_example' # str | One or more comma separated unique types of action (swap, addLiquidity, withdraw, donate, refund, switch)  (optional)
 
 try:
     # Actions List
@@ -66,7 +66,7 @@ Name | Type | Description  | Notes
  **address** | **str**| Comma separated list. Address of sender or recipient of any in/out transaction related to the action.  | [optional] 
  **txid** | **str**| ID of any in/out tx related to the action | [optional] 
  **asset** | **str**| Any asset that is part of the action (CHAIN.SYMBOL) | [optional] 
- **type** | **str**| One or more comma separated unique types of action (swap, addLiquidity, withdraw, donate, refund) | [optional] 
+ **type** | **str**| One or more comma separated unique types of action (swap, addLiquidity, withdraw, donate, refund, switch)  | [optional] 
 
 ### Return type
 

@@ -1,4 +1,5 @@
 import midgard_client
+from midgard_client.rest import ApiException as MidGardException
 import thornode_client
 from thornode_client.rest import ApiException as ThorNodeException
 import faster_than_requests as f_requests
@@ -13,17 +14,25 @@ thornode_log = get_logger("thornode", level=logging.DEBUG)
 user_log = get_logger("user", level=logging.DEBUG)
 ftx_log = get_logger("ftx", level=logging.DEBUG)
 from urllib3.exceptions import MaxRetryError
-
-
+from utils.calculator import amm_output, doubleswap_output
+from sys import getsizeof
 import ccxt.async_support as ccxt
 from ccxt.base.errors import RequestTimeout
 
 
-def amm(i_amount, i_depth, o_depth):
-    return i_amount * i_depth * o_depth / (i_amount + i_depth) ** 2
-
-
 class ThorOracle:
+    BLOCKTIME = {
+        'BNB': 1,
+        'ETH': 15,
+        'THOR': 5,
+    }
+    GAS_MULTIPLIER = {
+        'ETH': 35000, # USUAL TX SIZE: 250 BYTES, check contract address
+        'ERC-20': 70000,
+        'THOR': 1,
+        'BNB': 1,
+        'BTC': 250, # 250 bytes is roughly what you pay for a 1 in, 2 out + OP_RETURN.
+    }
     def __init__(self, host=None, network="multitestnet"):
         """Optional host parameter: list[string(host_ip)]"""
         self.networks = {"chaosnet": 'https://chaosnet-seed.thorchain.info',
@@ -36,19 +45,21 @@ class ThorOracle:
         self.thorNode_node = thornode_client.NodesApi()
         self.thorNode_pool = thornode_client.PoolsApi()
         self.thorNode_tx = thornode_client.TxApi()
-        self.num_seeding = 3
+        self.thorNode_vault = thornode_client.VaultsApi()
+        self.num_seeding = 2
         self.num_depth = 3
         self.host = host
         if host:
             self.num_seeding = len(host)
             self.num_depth = len(host)
-            user_log.info(f'host input: {host}')
+            user_log.debug(f'host input: {host}')
         self.inbound_addresses = []
         self.seeds = self.get_seed()
         thornode_log.debug(f'Network: {self.seed_service} Seeds collected: {self.seeds}')
         self.seed_time = datetime.utcnow()
         self.depths = self.parse_depth()
         self.depth_time = datetime.utcnow()
+
         thornode_log.info(f'Oracle Module On')
 
     def get_seed(self):
@@ -58,6 +69,7 @@ class ThorOracle:
             # proof and return user specified host
             for node_ip in self.host:
                 self.thorNode_network.api_client.configuration.host = f'http://{node_ip}:1317'
+                # self.thorNode_vault.api_client.configuration.host = f'http://{node_ip}:1317'
                 try:
                     thornode_log.info(f'probing {node_ip}')
                     inbound_address = self.thorNode_network.get_inbound_addresses()
@@ -110,7 +122,7 @@ class ThorOracle:
                 self.inbound_addresses = node_active_consensus[0]
                 return seeds_active
 
-    def get_inbound_addresses(self, cache_time=60.0):
+    def get_inbound_addresses(self, cache_time=300.0, chain=None):
         """Return cached ⌈2/3⌉ proofed inbound addresses and reload seeds"""
         delta = datetime.utcnow() - self.seed_time
         if delta.total_seconds() >= cache_time:
@@ -120,7 +132,38 @@ class ThorOracle:
                 if self.seeds:
                     self.seed_time = datetime.utcnow()
                     break
+        if chain:
+            if chain == 'ETH':
+                return next(filter(lambda entry: entry['chain'] == chain, self.inbound_addresses))
+            return next(filter(lambda entry: entry['chain'] == chain, self.inbound_addresses))['address']
         return self.inbound_addresses
+
+    def get_gas_rate(self, chain):
+        """Return lastblock_average * 1.5
+        THORCHAIN NETWORK FEE: last block_average * 3
+        ETH: Gwei
+        RUNE: RUNE
+        BNB: BNB
+        BTC: SATOSHI
+        """
+        return int(next(filter(lambda entry: entry['chain'] == chain, self.get_inbound_addresses()))['gas_rate'])
+
+    def get_network_fee(self, asset):
+        """
+        Return Gas Fee
+        THORCHAIN NETWORK FEE: last block_average * 3
+        """
+        if asset.chain == 'ETH':
+            # gasLimit = 21000 + 68 * dataByteLength : formula to calculate gas limit
+            if 'ETH' in asset.symbol:
+                gasLimit = self.GAS_MULTIPLIER['ETH']
+            else:
+                gasLimit = self.GAS_MULTIPLIER['ERC-20']
+            return gasLimit * self.get_gas_rate(chain=asset.chain) * 2 / 10**9 # RETURN IN ETH
+            #THORCHAIN TAKES 2 TIMES NETWORK FEE
+        if asset.chain == 'THOR':
+            return 0.02 # FIXED VALUE IN MIMIR
+
 
     def parse_depth(self):
         """Return pool_depth proofed by num_depth nodes"""
@@ -148,7 +191,7 @@ class ThorOracle:
         else:
             return depths[0]
 
-    def get_depth(self, cache_time=5.0):
+    def get_depth(self, cache_time=5.0, chain=None, assets=None):
         """Return cached pool_depth proofed by num_depth nodes"""
         delta = datetime.utcnow() - self.depth_time
         if delta.total_seconds() >= cache_time:
@@ -158,51 +201,100 @@ class ThorOracle:
                 if self.depths:
                     self.depth_time = datetime.utcnow()
                     break
+        if chain:
+            self.depths = list(filter(lambda pool: pool["asset"].split('.')[0] == chain, self.depths))
+            if assets:
+                self.depths = list(filter(lambda pool: pool["asset"].split('.')[1] in assets, self.depth))
+        elif assets:
+            self.depths = list(filter(lambda pool: pool["asset"].split('.')[1] in assets, self.depth))
         return self.depths
 
     def get_swap_output(self, in_amount, in_asset, out_asset):
-        pool_depths = self.get_depth()
+        """get swap output before fee"""
+        depth = self.get_depth()
         assert in_asset != out_asset
         # RUNE -> ALT
-        if in_asset == 'RUNE':
-            depth = next(filter(lambda pools: pools["asset"] == out_asset, self.depths))
+        if in_asset == 'THOR.RUNE':
+            depth = next(filter(lambda pools: pools["asset"] == out_asset, depth))
             asset_rune_weigh = int(depth["balance_rune"]) / int(depth["balance_asset"])
             thornode_log.debug(f'unit {out_asset} weigh {asset_rune_weigh} RUNE in pool')
-            return amm(int(in_amount*10**8), int(depth["balance_rune"]), int(depth["balance_asset"]))/10**8
+            return amm_output(int(in_amount*10**8), int(depth["balance_rune"]), int(depth["balance_asset"]))/10**8
         # ALT -> RUNE
-        if out_asset == 'RUNE':
-            depth = next(filter(lambda pools: pools["asset"] == in_asset, self.depths))
+        if out_asset == 'THOR.RUNE':
+            depth = next(filter(lambda pools: pools["asset"] == in_asset, depth))
             asset_rune_weigh = int(depth["balance_rune"]) / int(depth["balance_asset"])
             thornode_log.debug(f'unit {in_asset} weigh {asset_rune_weigh} RUNE in pool')
-            return amm(int(in_amount*10**8), int(depth["balance_asset"]), int(depth["balance_rune"]))/10**8
+            return amm_output(int(in_amount*10**8), int(depth["balance_asset"]), int(depth["balance_rune"]))/10**8
         # ALT -> ALT
-        return 0
+        pool1_data = next(filter(lambda pools: pools["asset"] == in_asset, depth))
+        pool2_data = next(filter(lambda pools: pools["asset"] == out_asset, depth))
+        return doubleswap_output(int(in_amount*10**8), pool1_data, pool2_data)/10**8
 
-    def get_swap_tx(self, tx_id, conf_time=5, timeout=300):
-        """Return tx detail"""
-        thornode_log.info(f'looking up tx: {tx_id}')
-        try:
-            self.thorNode_tx.api_client.configuration.host = f'http://{self.seeds[0]}:1317'
-            tx_detail = self.thorNode_tx.get_a_tx_with_given_hash(hash=tx_id)["observed_tx"]
-            if tx_detail:
-                status = tx_detail["status"]
-                thornode_log.info(f'status: {status}')
-                if status == 'done':
-                    thornode_log.info(f'{tx_detail["memo"]} success')
-                    tx_out = tx_detail["out_hashes"][0]
-                    tx_out_detail = self.thorNode_tx.get_a_tx_with_given_hash(hash=tx_out)["observed_tx"]
-                    return True
-            time.sleep(1)
-        except ThorNodeException as e:
-            if e.reason == 'Too Many Requests':
-                thornode_log.info(f'exceeded rate limit: {e}')
-                time.sleep(5)
-            elif e.reason == 'Not Found':
-                thornode_log.info(f'transaction not found: {e}')
-            else:
-                thornode_log.debug(f'exception calling get_tx: {e}')
+    def get_swap_out_tx(self, tx_id, block_time=1, timeout=300):
+        """Return out_hash of swap, checked that the out_tx has valid status"""
+        thornode_log.info(f'looking up tx: {tx_id} block_time: {block_time} timeout: {timeout}')
+        i = 0
+        while i < timeout:
+            try:
+                self.thorNode_tx.api_client.configuration.host = f'http://{self.seeds[0]}:1317'
+                tx_detail = self.thorNode_tx.get_a_tx_with_given_hash(hash=tx_id)["observed_tx"]
+                if tx_detail:
+                    thornode_log.info(f'tx found: {tx_id}')
+                    if "status" in tx_detail:
+                        status = tx_detail['status']
+                        thornode_log.info(f'status: {status}')
+                        if status == 'done':
+                            thornode_log.info(f'{tx_detail["tx"]["memo"]} success')
+                            tx_out = tx_detail["out_hashes"][0]
+                            thornode_log.debug(f'complete in_tx: {tx_detail}')
+                            return tx_out
+                        elif status == 'refund':
+                            return False
+                    else:
+                        thornode_log.info(f'waiting for status')
+            except ThorNodeException as e:
+                if e.reason == 'Too Many Requests':
+                    thornode_log.info(f'exceeded rate limit: {e}')
+                    time.sleep(5)
+                elif e.reason == 'Not Found':
+                    thornode_log.info(f'transaction not found')
+                    time.sleep(1)
+                else:
+                    thornode_log.debug(f'exception calling get_tx: {e}')
+            time.sleep(block_time)
+            i += 1
         thornode_log.info(f'looking up timed out')
         return False
+
+    def print_market_price(self, fiat="BNB.BUSD-74E"):
+        depth = self.get_depth()
+        fiat_pair = next(filter(lambda pools: pools["asset"] == fiat, depth))
+        rune_fiat_weigh = int(fiat_pair["balance_asset"]) / int(fiat_pair["balance_rune"])
+        thornode_log.debug(f'rune price: {rune_fiat_weigh}')
+        for pool in depth:
+            asset_rune_weigh = int(pool["balance_rune"]) / int(pool["balance_asset"])
+            thornode_log.debug(f'unit {pool["asset"]} weigh {asset_rune_weigh} RUNE in pool')
+            thornode_log.debug(f'fiat value: {asset_rune_weigh * rune_fiat_weigh}')
+
+    # ----------------- MID GARD AREA ----------------
+    def get_action_by_tx(self, tx_id):
+        self.midgard.api_client.configuration.host = f'http://{self.seeds[0]}:8080'
+        bytes = ''
+        # -------------------------------data base module---------------------------------
+        while True:
+            try:
+                action = self.midgard.get_actions(txid=tx_id, limit=1, offset=0)
+                if int(action.count) != 0:
+                    break
+            except MidGardException as e:
+                midgard_log.debug(f'ip {self.seeds[0]} error {e}')
+            time.sleep(1)
+            bytes+='.'
+            if getsizeof(bytes) > 99:
+                midgard_log.debug(f'ip {self.seeds[0]} 49 seconds have passed')
+                bytes = ''
+        midgard_log.debug(f'action detail: {action}')
+        return action
 
 
 class FtxOracle:

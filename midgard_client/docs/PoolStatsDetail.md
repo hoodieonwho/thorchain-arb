@@ -12,6 +12,7 @@ Name | Type | Description | Notes
 **asset_price** | **str** | Float, price of asset in rune. I.e. rune amount / asset amount | 
 **asset_price_usd** | **str** | Float, the price of asset in USD (based on the deepest USD pool). | 
 **average_slip** | **str** | Float64 (Basis points, 0-10000, where 10000&#x3D;100%), same as history/swaps:averageSlip | 
+**impermanent_loss_protection_paid** | **str** | Int64(e8), part of the withdrawRuneVolume which was payed because of impermanent loss protection.  | 
 **pool_apy** | **str** | Float, Average Percentage Yield: annual return estimated using last weeks income, taking compound interest into account. | 
 **rune_depth** | **str** | Int64(e8), the amount of Rune in the pool | 
 **status** | **str** | The state of the pool, e.g. Available, Staged | 

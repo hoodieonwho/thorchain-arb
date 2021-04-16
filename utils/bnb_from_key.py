@@ -8,6 +8,7 @@ def init_binance_dex_private():
    private_key = open("secret/bnb_key.txt", 'r').read()
    env = BinanceEnvironment.get_testnet_env()
    wallet = Wallet(private_key, env)
+   print(wallet.address)
    client = HttpApiClient(env)
    print(wallet.address)
    transfer_msg = TransferMsg(

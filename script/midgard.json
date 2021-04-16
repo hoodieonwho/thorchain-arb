@@ -269,7 +269,8 @@
 							"addLiquidity",
 							"withdraw",
 							"donate",
-							"refund"
+							"refund",
+							"switch"
 						],
 						"type": "string"
 					}
@@ -704,6 +705,10 @@
 						"format": "int64",
 						"type": "integer"
 					},
+					"BadValidatorRedline": {
+						"example": 3,
+						"type": "integer"
+					},
 					"BlocksPerYear": {
 						"example": 6311390,
 						"format": "int64",
@@ -716,11 +721,6 @@
 					},
 					"ChurnRetryInterval": {
 						"example": 30,
-						"format": "int64",
-						"type": "integer"
-					},
-					"CliTxCost": {
-						"example": 0,
 						"format": "int64",
 						"type": "integer"
 					},
@@ -749,8 +749,18 @@
 						"format": "int64",
 						"type": "integer"
 					},
+					"FullImpLossProtectionBlocks": {
+						"example": 1440000,
+						"format": "int64",
+						"type": "integer"
+					},
 					"FundMigrationInterval": {
 						"example": 60,
+						"format": "int64",
+						"type": "integer"
+					},
+					"IncentiveCurve": {
+						"example": 100,
 						"format": "int64",
 						"type": "integer"
 					},
@@ -774,6 +784,31 @@
 						"format": "int64",
 						"type": "integer"
 					},
+					"MaxAvailablePools": {
+						"example": 10,
+						"format": "int64",
+						"type": "integer"
+					},
+					"MaxSwapsPerBlock": {
+						"example": 10,
+						"format": "int64",
+						"type": "integer"
+					},
+					"MinRunePoolDepth": {
+						"example": 10,
+						"format": "int64",
+						"type": "integer"
+					},
+					"MinSlashPointsForBadValidator": {
+						"example": 10,
+						"format": "int64",
+						"type": "integer"
+					},
+					"MinSwapsPerBlock": {
+						"example": 10,
+						"format": "int64",
+						"type": "integer"
+					},
 					"MinimumBondInRune": {
 						"example": 100000000,
 						"format": "int64",
@@ -789,7 +824,7 @@
 						"format": "int64",
 						"type": "integer"
 					},
-					"NativeChainGasFee": {
+					"NativeTransactionFee": {
 						"example": 10000000,
 						"format": "int64",
 						"type": "integer"
@@ -819,8 +854,18 @@
 						"format": "int64",
 						"type": "integer"
 					},
+					"PoolCycle": {
+						"example": 43200,
+						"format": "int64",
+						"type": "integer"
+					},
 					"SigningTransactionPeriod": {
 						"example": 300,
+						"format": "int64",
+						"type": "integer"
+					},
+					"VirtualMultSynths": {
+						"example": 2,
 						"format": "int64",
 						"type": "integer"
 					},
@@ -833,30 +878,38 @@
 				"required": [
 					"AsgardSize",
 					"BadValidatorRate",
+					"BadValidatorRedline",
 					"BlocksPerYear",
 					"ChurnInterval",
 					"ChurnRetryInterval",
-					"CliTxCost",
 					"DesiredValidatorSet",
 					"DoubleSignMaxAge",
 					"EmissionCurve",
 					"FailKeygenSlashPoints",
 					"FailKeysignSlashPoints",
+					"FullImpLossProtectionBlocks",
 					"FundMigrationInterval",
+					"IncentiveCurve",
 					"JailTimeKeygen",
 					"JailTimeKeysign",
 					"LackOfObservationPenalty",
 					"LiquidityLockUpBlocks",
+					"MaxAvailablePools",
+					"MaxSwapsPerBlock",
+					"MinRunePoolDepth",
+					"MinSlashPointsForBadValidator",
+					"MinSwapsPerBlock",
 					"MinimumBondInRune",
 					"MinimumNodesForBFT",
 					"MinimumNodesForYggdrasil",
-					"NativeChainGasFee",
-					"NewPoolCycle",
+					"NativeTransactionFee",
 					"ObservationDelayFlexibility",
 					"ObserveSlashPoints",
 					"OldValidatorRate",
 					"OutboundTransactionFee",
+					"PoolCycle",
 					"SigningTransactionPeriod",
+					"VirtualMultSynths",
 					"YggFundLimit"
 				],
 				"type": "object"
@@ -882,16 +935,19 @@
 						"type": "string"
 					},
 					"last_observed_in": {
-						"example": "1590",
-						"type": "string"
+						"example": 1590,
+						"format": "int64",
+						"type": "integer"
 					},
 					"last_signed_out": {
-						"example": "109",
-						"type": "string"
+						"example": 109,
+						"format": "int64",
+						"type": "integer"
 					},
 					"thorchain": {
-						"example": "1548",
-						"type": "string"
+						"example": 1548,
+						"format": "int64",
+						"type": "integer"
 					}
 				},
 				"required": [
@@ -945,6 +1001,10 @@
 						"description": "Int64, The end time of bucket in unix timestamp",
 						"type": "string"
 					},
+					"impermanentLossProtectionPaid": {
+						"description": "Int64(e8), part of the withdrawRuneVolume which was payed because of impermanent loss\nprotection.\n",
+						"type": "string"
+					},
 					"net": {
 						"description": "Int64(e8), net liquidity changes (withdrawals - deposits) during the time interval",
 						"type": "string"
@@ -983,6 +1043,7 @@
 					"addLiquidityCount",
 					"withdrawAssetVolume",
 					"withdrawRuneVolume",
+					"impermanentLossProtectionPaid",
 					"withdrawVolume",
 					"withdrawCount",
 					"net",
@@ -1491,6 +1552,10 @@
 						"description": "Float64 (Basis points, 0-10000, where 10000=100%), same as history/swaps:averageSlip",
 						"type": "string"
 					},
+					"impermanentLossProtectionPaid": {
+						"description": "Int64(e8), part of the withdrawRuneVolume which was payed because of impermanent loss\nprotection.\n",
+						"type": "string"
+					},
 					"poolAPY": {
 						"description": "Float, Average Percentage Yield: annual return estimated using last weeks income, taking compound interest into account.",
 						"type": "string"
@@ -1604,6 +1669,7 @@
 					"addLiquidityCount",
 					"withdrawAssetVolume",
 					"withdrawRuneVolume",
+					"impermanentLossProtectionPaid",
 					"withdrawVolume",
 					"withdrawCount",
 					"uniqueMemberCount"
@@ -1811,6 +1877,10 @@
 						"description": "Int64, unique users (addresses) initiating swaps in the last 24 hours.",
 						"type": "string"
 					},
+					"impermanentLossProtectionPaid": {
+						"description": "Int64(e8), impermanent loss protection paid out.\n",
+						"type": "string"
+					},
 					"monthlyActiveUsers": {
 						"description": "Int64, unique users (addresses) initiating swaps in the last 30 days.",
 						"type": "string"
@@ -1839,6 +1909,10 @@
 						"description": "Int64(e8), total volume of swaps denoted in Rune since beginning.",
 						"type": "string"
 					},
+					"switchedRune": {
+						"description": "Int64(e8), amount of native rune switched from erc20 or BEPSwap rune.",
+						"type": "string"
+					},
 					"toAssetCount": {
 						"description": "Int64, number of swaps from Rune to Asset since beginning.",
 						"type": "string"
@@ -1862,6 +1936,7 @@
 				},
 				"required": [
 					"runeDepth",
+					"switchedRune",
 					"runePriceUSD",
 					"swapVolume",
 					"swapCount24h",
@@ -1874,6 +1949,7 @@
 					"uniqueSwapperCount",
 					"addLiquidityVolume",
 					"withdrawVolume",
+					"impermanentLossProtectionPaid",
 					"addLiquidityCount",
 					"withdrawCount"
 				],
@@ -2076,7 +2152,7 @@
 		},
 		"description": "The Midgard Public API queries THORChain and any chains linked via the Bifröst and prepares information about the network to be readily available for public users. The API parses transaction event data from THORChain and stores them in a time-series database to make time-dependent queries easy. Midgard does not hold critical information. To interact with BEPSwap and Asgardex, users should query THORChain directly.",
 		"title": "Midgard Public API",
-		"version": "2.0.0-alpha.3"
+		"version": "2.0.1"
 	},
 	"openapi": "3.0.0",
 	"paths": {
@@ -2113,7 +2189,7 @@
 						}
 					},
 					{
-						"description": "One or more comma separated unique types of action (swap, addLiquidity, withdraw, donate, refund)",
+						"description": "One or more comma separated unique types of action\n(swap, addLiquidity, withdraw, donate, refund, switch)\n",
 						"example": "swap,addLiquidity",
 						"in": "query",
 						"name": "type",
