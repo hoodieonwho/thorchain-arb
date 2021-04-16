@@ -55,43 +55,42 @@ class Account:
         # ----------------- BTC
         balance = await self.btc.get_balance()
         address = self.btc.get_address()
-        print(f'BTC asset: {balance.asset} amount:{balance.amount}')
-        print(address)
+        account_log.info(
+            f'BTC asset: {balance.asset} amount:{balance.amount} address: {address}'
+        )
         # ----------------- ETH
         balance = await self.eth.get_balance()
         address = self.eth.get_address()
         # TODO
         # add balance module in eth package
-        print(f'ETH balance :{balance}')
-        print(address)
-        # thor_token_address = "0xd601c6A3a36721320573885A8d8420746dA3d7A0"
-        # token_contract = await self.eth.get_contract(thor_token_address, erc20=True)
-        # symbol = token_contract.functions.symbol().call()
-        # print(symbol)
+        account_log.info(
+            f'ETH balance :{balance} address: {address}'
+        )
         # ----------------- LTC
         balance = await self.ltc.get_balance()
         address = self.ltc.get_address()
-        print(f'LTC asset: {balance.asset} amount:{balance.amount}')
-        print(address)
+        account_log.info(
+            f'LTC asset: {balance.asset} amount:{balance.amount} address: {address}'
+        )
         # ----------------- Binance Dex
         balances = await self.bnb_dex.get_balance()
         address = self.bnb_dex.get_address()
         if balance:
             for balance in balances:
-                print(f'BNB DEX asset: {balance.asset} amount:{balance.amount}')
+                account_log.info(f'BNB DEX asset: {balance.asset} amount:{balance.amount}')
         else:
-            print("no balance")
-        print(address)
+            account_log.info("no balance")
+        account_log.info(f'address: {address}')
         # ----------------- FTX
         balance = await self.ftx.fetch_balance()
         address = await self.ftx.fetch_deposit_address('RUNE')
-        print(f'FTX balance: {balance}')
-        print(f'Deposit Address {address["address"]} Memo {address["tag"]}')
+        account_log.info(f'FTX balance: {balance}')
+        account_log.info(f'Deposit Address {address["address"]} Memo {address["tag"]}')
         # ----------------- THOR
         balance = await self.thor.get_balance()
         address = self.thor.get_address()
-        print(f'THOR balance: {balance}')
-        print(f'address: {address}')
+        account_log.info(f'THOR balance: {balance}')
+        account_log.info(f'address: {address}')
 
     async def thor_swap(self, asset, amount, recipient, memo):
         if asset.chain == 'BNB':
@@ -115,7 +114,7 @@ class Account:
                 tx_detail = await self.eth.write_contract(router_addr, func_to_call, asgard_addr, asset_address,
                                                    int(amount * 10 ** 18),
                                                    memo, erc20=False, eth_to_be_sent=amount)
-                account_log.debug(f'tx_in: {tx_detail}')
+                account_log.debug(f'ETH tx_in generated: {tx_detail}')
                 tx = tx_detail["transactionHash"].hex()[2:]
         return tx
 
@@ -129,3 +128,12 @@ class Account:
         elif asset.chain == 'BNB':
             tx_detail = self.bnb_dex.get_transaction_data(tx_id)
             return tx_detail
+
+    def get_address(self, asset):
+        if asset.chain == 'ETH':
+            addr = self.eth.get_address()
+        elif asset.chain == 'BNB':
+            addr = self.bnb_dex.get_address()
+        elif asset.chain == 'THOR':
+            addr = self.thor.get_address()
+        return addr

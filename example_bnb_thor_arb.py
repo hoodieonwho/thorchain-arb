@@ -15,36 +15,42 @@ class THORTrader:
         self.oracle = ThorOracle(host=host)
         self.account = Account()
 
-    async def swap(self, in_count, in_coin: Asset, out_coin: Asset, wait=True, dest_addr=''):
-        output = self.oracle.get_swap_output(in_count, str(in_coin), str(out_coin))
-        # gas_rate = 1.5 x block average ;
-        gas_rate = self.oracle.get_gas_rate(out_coin.chain)
-        tx_size = 500
-        # thorchain takes 3 x block average;
-        gas_fee = gas_rate * tx_size * 2
+    def estimate_swap_output(self, in_amount, in_coin:Asset, out_coin: Asset):
+        output_before_fee = self.oracle.get_swap_output(in_amount, str(in_coin), str(out_coin))
+        network_fee = self.oracle.get_network_fee(asset=out_coin)
+        output_after_fee = output_before_fee - network_fee
+        swap_log.debug(
+            f'network fee: {network_fee} {out_coin.symbol}\n'
+            f'expected output before network: {output_before_fee} {out_coin}\n'
+            f'expected output after network fee: {output_after_fee} {out_coin}\n'
+        )
+        return output_after_fee
+
+    async def swap(self, in_amount, in_coin: Asset, out_coin: Asset, wait=True, dest_addr=''):
         vault_addr = self.oracle.get_inbound_addresses(chain=in_coin.chain)
-        if out_coin.chain == 'ETH':
-            dest_addr = self.account.eth.get_address()
-        elif out_coin.chain == 'BNB':
-            dest_addr = self.account.bnb_dex.get_address()
-        elif out_coin.chain == 'THOR':
-            dest_addr = self.account.thor.get_address()
+        dest_addr = self.account.get_address(asset=out_coin)
         memo = f'{self.op_code["SWAP"]}:{str(out_coin)}:{dest_addr}'
         swap_log.debug(
-            f'swap on chain {in_coin.chain}: {in_coin.symbol} {in_count} {dest_addr} '
-            f'gas_rate {gas_rate} gas_fee {gas_fee/10**9} '
-            f'expected output before gas: {output} {out_coin.chain} {out_coin.symbol}'
-            f'memo: {memo} '
+            f'sending {in_amount} {in_coin} to {dest_addr}\n'
+            f'memo: {memo}'
         )
-        in_tx = await self.account.thor_swap(asset=in_coin, amount=in_count, recipient=vault_addr, memo=memo)
-        out_tx = self.oracle.get_swap_out_tx(tx_id=in_tx)
+        in_tx = await self.account.thor_swap(asset=in_coin, amount=in_amount, recipient=vault_addr, memo=memo)
+        swap_log.debug(
+            f'sending {in_amount} {in_coin} to {dest_addr}\n'
+            f'memo: {memo}'
+            f'in_tx: {in_tx}'
+        )
+        out_tx = self.oracle.get_swap_out_tx(tx_id=in_tx, block_time=self.oracle.BLOCKTIME[out_coin.chain])
         if out_tx:
             # if not wait:
             #     f'not waiting mode - out_tx : {out_tx}'
             #     return out_tx
             # else:
-                f'waiting mode - out_tx : {out_tx}'
-                return self.oracle.get_action_detail(out_tx)
+            swap_log.debug(f'waiting mode - out_tx : {out_tx}')
+            if out_coin.chain == 'THOR':
+                return self.oracle.get_action_by_tx(in_tx)
+            else:
+                return self.oracle.get_action_by_tx(out_tx)
         else:
             swap_log.error(
                 f'tx_in {in_tx} failed'
@@ -52,8 +58,8 @@ class THORTrader:
             return 0
 
 
-T = THORTrader(host=["52.37.64.67"])
-#T = THORTrader()
+# This should be the interface people are facing
+T = THORTrader()
 
 loop = asyncio.get_event_loop()
 # print account balance
@@ -65,10 +71,15 @@ T.oracle.print_market_price()
 assetA = Asset.from_str("ETH.ETH")
 assetB = Asset.from_str("THOR.RUNE")
 amount = 0.01
-# action_detail = loop.run_until_complete(T.swap(amount, assetA, assetB))
-#
+output = T.estimate_swap_output(amount, assetA, assetB)
+action_detail = loop.run_until_complete(T.swap(amount, assetA, assetB))
+
+# ETH -> ETH.USDT
+
 
 # ETH.USDT -> RUNE
+assetA = Asset.from_str("ETH.ETH")
+
 # Approve tx:
 # https://ropsten.etherscan.io/tx/0x50e5b7d4f3c097e2e1398bb384fd98bc1f8fe1565f912d69bda465337ae3e0aa
 # ethereum default decimals: 18
@@ -83,18 +94,12 @@ amount = 0.01
 
 # ETH -> BNB
 
-
-
-
 ## Finishing Part
 loop.run_until_complete(T.account.bnb_dex.purge_client())
 T.account.eth.purge_client()
 loop.run_until_complete(T.account.ftx.close())
-
-print("loop finished")
 loop.close()
 
-action = T.oracle.midgard.get_actions(txid="E01D9B503ADEA5E693BF0E78F644764B171F6ABDAFB8A4C02705C5E5BB20DE01", limit=5, offset=0)
 # inputRune = 10 RUNE
 # inputNetworkFee = 0.02 RUNE
 # outputNetworkFee = 0.00105 ETH

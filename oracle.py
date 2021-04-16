@@ -20,13 +20,19 @@ import ccxt.async_support as ccxt
 from ccxt.base.errors import RequestTimeout
 
 
-
-BLOCKTIME = {
-    'BNB' : '5',
-    'ETH' : ''
-}
-
 class ThorOracle:
+    BLOCKTIME = {
+        'BNB': 1,
+        'ETH': 15,
+        'THOR': 5,
+    }
+    GAS_MULTIPLIER = {
+        'ETH': 35000, # USUAL TX SIZE: 250 BYTES, check contract address
+        'ERC-20': 70000,
+        'THOR': 1,
+        'BNB': 1,
+        'BTC': 250, # 250 bytes is roughly what you pay for a 1 in, 2 out + OP_RETURN.
+    }
     def __init__(self, host=None, network="multitestnet"):
         """Optional host parameter: list[string(host_ip)]"""
         self.networks = {"chaosnet": 'https://chaosnet-seed.thorchain.info',
@@ -53,8 +59,8 @@ class ThorOracle:
         self.seed_time = datetime.utcnow()
         self.depths = self.parse_depth()
         self.depth_time = datetime.utcnow()
+
         thornode_log.info(f'Oracle Module On')
-        self.midgard = midgard_client.DefaultApi()
 
     def get_seed(self):
         """Return ⌈2/3⌉ proofed active node ips and parse inbound_addresses"""
@@ -134,14 +140,30 @@ class ThorOracle:
 
     def get_gas_rate(self, chain):
         """Return lastblock_average * 1.5
-        ETH: Gwei 35K GAS FOR ETH, 70K GAS FOR ERC20
+        THORCHAIN NETWORK FEE: last block_average * 3
+        ETH: Gwei
         RUNE: RUNE
-        BNB: 1
-        BTC: 250 Bytes
+        BNB: BNB
+        BTC: SATOSHI
         """
-        if chain == 'THOR':
-            return 0.02
         return int(next(filter(lambda entry: entry['chain'] == chain, self.get_inbound_addresses()))['gas_rate'])
+
+    def get_network_fee(self, asset):
+        """
+        Return Gas Fee
+        THORCHAIN NETWORK FEE: last block_average * 3
+        """
+        if asset.chain == 'ETH':
+            # gasLimit = 21000 + 68 * dataByteLength : formula to calculate gas limit
+            if 'ETH' in asset.symbol:
+                gasLimit = self.GAS_MULTIPLIER['ETH']
+            else:
+                gasLimit = self.GAS_MULTIPLIER['ERC-20']
+            return gasLimit * self.get_gas_rate(chain=asset.chain) * 2 / 10**9 # RETURN IN ETH
+            #THORCHAIN TAKES 2 TIMES NETWORK FEE
+        if asset.chain == 'THOR':
+            return 0.02 # FIXED VALUE IN MIMIR
+
 
     def parse_depth(self):
         """Return pool_depth proofed by num_depth nodes"""
@@ -208,9 +230,9 @@ class ThorOracle:
         pool2_data = next(filter(lambda pools: pools["asset"] == out_asset, depth))
         return doubleswap_output(int(in_amount*10**8), pool1_data, pool2_data)/10**8
 
-    def get_swap_out_tx(self, tx_id, conf_time=5, timeout=300):
+    def get_swap_out_tx(self, tx_id, block_time=1, timeout=300):
         """Return out_hash of swap, checked that the out_tx has valid status"""
-        thornode_log.info(f'looking up tx: {tx_id}')
+        thornode_log.info(f'looking up tx: {tx_id} block_time: {block_time} timeout: {timeout}')
         i = 0
         while i < timeout:
             try:
@@ -226,6 +248,8 @@ class ThorOracle:
                             tx_out = tx_detail["out_hashes"][0]
                             thornode_log.debug(f'complete in_tx: {tx_detail}')
                             return tx_out
+                        elif status == 'refund':
+                            return False
                     else:
                         thornode_log.info(f'waiting for status')
             except ThorNodeException as e:
@@ -237,7 +261,7 @@ class ThorOracle:
                     time.sleep(1)
                 else:
                     thornode_log.debug(f'exception calling get_tx: {e}')
-            time.sleep(1)
+            time.sleep(block_time)
             i += 1
         thornode_log.info(f'looking up timed out')
         return False
@@ -253,14 +277,13 @@ class ThorOracle:
             thornode_log.debug(f'fiat value: {asset_rune_weigh * rune_fiat_weigh}')
 
     # ----------------- MID GARD AREA ----------------
-    def get_action_detail(self, tx_id):
+    def get_action_by_tx(self, tx_id):
         self.midgard.api_client.configuration.host = f'http://{self.seeds[0]}:8080'
         bytes = ''
         # -------------------------------data base module---------------------------------
         while True:
             try:
-                action = self.midgard.get_actions(txid=tx_id, limit=5, offset=0)
-                midgard_log.debug(f'{action}')
+                action = self.midgard.get_actions(txid=tx_id, limit=1, offset=0)
                 if int(action.count) != 0:
                     break
             except MidGardException as e:
@@ -272,6 +295,7 @@ class ThorOracle:
                 bytes = ''
         midgard_log.debug(f'action detail: {action}')
         return action
+
 
 class FtxOracle:
     def __init__(self, api_key, api_secret, subaccount=None):
