@@ -15,12 +15,12 @@ class THORTrader:
         self.oracle = ThorOracle(host=host)
         self.account = Account()
 
-    def estimate_swap_output(self, in_amount, in_coin:Asset, out_coin: Asset):
+    def estimate_swap_output(self, in_amount, in_coin: Asset, out_coin: Asset):
         output_before_fee = self.oracle.get_swap_output(in_amount, str(in_coin), str(out_coin))
-        network_fee = self.oracle.get_network_fee(asset=out_coin)
+        network_fee = self.oracle.get_network_fee(in_coin, out_coin)
         output_after_fee = output_before_fee - network_fee
-        swap_log.debug(
-            f'network fee: {network_fee} {out_coin.symbol}\n'
+        swap_log.info(
+            f'expected network fee: {network_fee} {out_coin.symbol}\n'
             f'expected output before network: {output_before_fee} {out_coin}\n'
             f'expected output after network fee: {output_after_fee} {out_coin}\n'
         )
@@ -30,14 +30,10 @@ class THORTrader:
         vault_addr = self.oracle.get_inbound_addresses(chain=in_coin.chain)
         dest_addr = self.account.get_address(asset=out_coin)
         memo = f'{self.op_code["SWAP"]}:{str(out_coin)}:{dest_addr}'
-        swap_log.debug(
-            f'sending {in_amount} {in_coin} to {dest_addr}\n'
-            f'memo: {memo}'
-        )
         in_tx = await self.account.thor_swap(asset=in_coin, amount=in_amount, recipient=vault_addr, memo=memo)
-        swap_log.debug(
-            f'sending {in_amount} {in_coin} to {dest_addr}\n'
-            f'memo: {memo}'
+        swap_log.info(
+            f'sending {in_amount} {in_coin} to {vault_addr}\n'
+            f'memo: {memo}\n'
             f'in_tx: {in_tx}'
         )
         out_tx = self.oracle.get_swap_out_tx(tx_id=in_tx, block_time=self.oracle.BLOCKTIME[out_coin.chain])
@@ -67,18 +63,84 @@ loop.run_until_complete(T.account.statement())
 # print market price
 T.oracle.print_market_price()
 
+# TEST CASES ETHEREUM TO OTHERS
 # ETH -> RUNE
-assetA = Asset.from_str("ETH.ETH")
-assetB = Asset.from_str("THOR.RUNE")
-amount = 0.01
-output = T.estimate_swap_output(amount, assetA, assetB)
-action_detail = loop.run_until_complete(T.swap(amount, assetA, assetB))
+# assetA = Asset.from_str("ETH.ETH")
+# assetB = Asset.from_str("THOR.RUNE")
+# amount = 0.01
+# output = T.estimate_swap_output(amount, assetA, assetB)
+# action_detail = loop.run_until_complete(T.swap(amount, assetA, assetB))
 
 # ETH -> ETH.USDT
+# assetA = Asset.from_str('ETH.ETH')
+# assetB = Asset.from_str("ETH.USDT-0XA3910454BF2CB59B8B3A401589A3BACC5CA42306")
+# amount = 0.3
+# output = T.estimate_swap_output(amount, assetA, assetB)
+# action_detail = loop.run_until_complete(T.swap(amount, assetA, assetB))
 
+# ETH -> BNB.BNB
+# assetA = Asset.from_str("ETH.ETH")
+# assetB = Asset.from_str("BNB.BNB")
+# amount = 0.1
+# output = T.estimate_swap_output(amount, assetA, assetB)
+# action_detail = loop.run_until_complete(T.swap(amount, assetA, assetB))
 
+# ETH -> BNB.BUSD
+# assetA = Asset.from_str("ETH.ETH")
+# assetB = Asset.from_str("BNB.BUSD-74E")
+# amount = 0.1
+# output = T.estimate_swap_output(amount, assetA, assetB)
+# action_detail = loop.run_until_complete(T.swap(amount, assetA, assetB))
+
+# TEST CASES ERC20 TO OTHERS !!! UNTESTED
 # ETH.USDT -> RUNE
-assetA = Asset.from_str("ETH.ETH")
+# assetA = Asset.from_str("ETH.ETH")
+
+# TEST CASES BEP20 TO OTHERS
+# BUSD -> RUNE
+# assetA = Asset.from_str("BNB.BUSD-74E")
+# assetB = Asset.from_str("THOR.RUNE")
+# amount = 300
+# output = T.estimate_swap_output(amount, assetA, assetB)
+# action_detail = loop.run_until_complete(T.swap(amount, assetA, assetB))
+#
+# # BUSD -> ETH
+# assetA = Asset.from_str("BNB.BUSD-74E")
+# assetB = Asset.from_str("ETH.ETH")
+# amount = 300
+# output = T.estimate_swap_output(amount, assetA, assetB)
+# action_detail = loop.run_until_complete(T.swap(amount, assetA, assetB))
+#
+# # BUSD -> LTC
+# assetA = Asset.from_str("BNB.BUSD-74E")
+# assetB = Asset.from_str("LTC.LTC")
+# amount = 300
+# output = T.estimate_swap_output(amount, assetA, assetB)
+# action_detail = loop.run_until_complete(T.swap(amount, assetA, assetB))
+#
+# # BUSD -> BNB.BNB
+# assetA = Asset.from_str("BNB.BUSD-74E")
+# assetB = Asset.from_str("BNB.BNB")
+# amount = 300
+# output = T.estimate_swap_output(amount, assetA, assetB)
+# action_detail = loop.run_until_complete(T.swap(amount, assetA, assetB))
+#
+
+### UN TESTED
+# # BUSD -> BTC
+# assetA = Asset.from_str("BNB.BUSD-74E")
+# assetB = Asset.from_str("BTC.BTC")
+# amount = 300
+# output = T.estimate_swap_output(amount, assetA, assetB)
+# action_detail = loop.run_until_complete(T.swap(amount, assetA, assetB))
+#
+# # BUSD -> ERC20
+# assetA = Asset.from_str("BNB.BUSD-74E")
+# assetB = Asset.from_str("ETH.USDT-0XA3910454BF2CB59B8B3A401589A3BACC5CA42306")
+# assetC = Asset.from_str("ETH.DAI-0XAD6D458402F60FD3BD25163575031ACDCE07538D")
+# amount = 300
+# output = T.estimate_swap_output(amount, assetA, assetB)
+# action_detail = loop.run_until_complete(T.swap(amount, assetA, assetB))
 
 # Approve tx:
 # https://ropsten.etherscan.io/tx/0x50e5b7d4f3c097e2e1398bb384fd98bc1f8fe1565f912d69bda465337ae3e0aa
@@ -88,20 +150,13 @@ assetA = Asset.from_str("ETH.ETH")
 # use deposit to send token
 
 
-# BNB -> RUNE
 
-# BNB -> ETH
 
-# ETH -> BNB
 
 ## Finishing Part
 loop.run_until_complete(T.account.bnb_dex.purge_client())
 T.account.eth.purge_client()
 loop.run_until_complete(T.account.ftx.close())
 loop.close()
-
-# inputRune = 10 RUNE
-# inputNetworkFee = 0.02 RUNE
-# outputNetworkFee = 0.00105 ETH
 
 

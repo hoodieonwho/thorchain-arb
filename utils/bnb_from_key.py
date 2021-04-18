@@ -4,9 +4,8 @@ from py_binance_chain.messages import TransferMsg
 from py_binance_chain.wallet import Wallet
 
 
-def init_binance_dex_private():
-   private_key = open("secret/bnb_key.txt", 'r').read()
-   env = BinanceEnvironment.get_testnet_env()
+def init_binance_dex_private(private_key):
+   env = BinanceEnvironment.get_production_env()
    wallet = Wallet(private_key, env)
    print(wallet.address)
    client = HttpApiClient(env)
