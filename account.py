@@ -5,40 +5,38 @@ from xchainpy_binance.client import Client as BinanceClient
 from xchainpy_litecoin.client import Client as LitecoinClient
 from xchainpy_thorchain.client import Client as THORChainClient
 from xchainpy_util.asset import Asset
-import ccxt.async_support as ccxt
 from logger import get_logger, logging
 account_log = get_logger("account", level=logging.DEBUG)
 
+
+MNEMONICFILE = "secret/real_mnemonic"
+NETWORK = 'mainnet' # ropsten for eth testnet
+
+
 def init_eth():
-    return EthereumClient(phrase=open("secret/mnemonic", 'r').read(),
-                          network=open("resources/ropsten/network", 'r').read(),
-                          network_type="ropsten",
+    return EthereumClient(phrase=open(MNEMONICFILE, 'r').read(),
+                          network=open(f'resources/{NETWORK}/network', 'r').read(),
+                          network_type=NETWORK,
                           ether_api=open("resources/ether_api", 'r').read())
 
 
 def init_btc():
-    return BitcoinClient(phrase=open("secret/mnemonic", 'r').read(),
-                         network="testnet")
+    return BitcoinClient(phrase=open(MNEMONICFILE, 'r').read(),
+                         network=NETWORK)
 
 
 def init_bnb_dex():
-    return BinanceClient(phrase=open("secret/mnemonic", 'r').read(),
-                         network="testnet")
+    return BinanceClient(phrase=open(MNEMONICFILE, 'r').read(),
+                         network=NETWORK)
 
 
 def init_ltc():
-    return LitecoinClient(phrase=open("secret/mnemonic", 'r').read(),
-                          network="testnet")
+    return LitecoinClient(phrase=open(MNEMONICFILE, 'r').read(),
+                          network=NETWORK)
 
 def init_thor():
-    return THORChainClient(phrase=open("secret/mnemonic", 'r').read(),
-                                   network="testnet")
-
-def init_ftx():
-    return ccxt.ftx({'apiKey': f'{open("secret/ftx_api_key.txt").read()}',
-                                    'secret': f'{open("secret/ftx_api_secret.txt").read()}',
-                                    'enableRateLimit': True,
-                                    'headers': {'FTX-SUBACCOUNT': 'arb'}})
+    return THORChainClient(phrase=open(MNEMONICFILE, 'r').read(),
+                          network=NETWORK)
 
 
 class Account:
@@ -48,7 +46,6 @@ class Account:
         # self.eth.set_gas_strategy("fast")
         self.ltc = init_ltc()
         self.bnb_dex = init_bnb_dex()
-        self.ftx = init_ftx()
         self.thor = init_thor()
 
     async def statement(self):
@@ -75,24 +72,20 @@ class Account:
         # ----------------- Binance Dex
         balances = await self.bnb_dex.get_balance()
         address = self.bnb_dex.get_address()
-        if balance:
+        if balances:
             for balance in balances:
                 account_log.info(f'BNB DEX asset: {balance.asset} amount:{balance.amount}')
         else:
             account_log.info("no balance")
         account_log.info(f'address: {address}')
-        # ----------------- FTX
-        balance = await self.ftx.fetch_balance()
-        address = await self.ftx.fetch_deposit_address('RUNE')
-        account_log.info(f'FTX balance: {balance}')
-        account_log.info(f'Deposit Address {address["address"]} Memo {address["tag"]}')
         # ----------------- THOR
-        balance = await self.thor.get_balance()
-        address = self.thor.get_address()
-        account_log.info(f'THOR balance: {balance}')
-        account_log.info(f'address: {address}')
+        # balance = await self.thor.get_balance()
+        # address = self.thor.get_address()
+        # account_log.info(f'THOR balance: {balance}')
+        # account_log.info(f'address: {address}')
 
-    async def thor_swap(self, asset, amount, recipient, memo):
+    async def thor_swap(self, asset: Asset, amount, recipient, memo):
+        tx = ''
         if asset.chain == 'BNB':
             tx = await self.bnb_dex.transfer(asset=asset, amount=amount,
                                              recipient=recipient, memo=memo)
@@ -129,11 +122,23 @@ class Account:
             tx_detail = self.bnb_dex.get_transaction_data(tx_id)
             return tx_detail
 
+    async def get_balance(self, asset):
+        if asset.chain == 'BNB':
+            balances = await self.bnb_dex.get_balance(asset=asset)
+            if balances:
+                account_log.info(f'BNB DEX asset: {balances[0].asset} amount:{balances[0].amount}')
+                return balances[0].amount
+            else:
+                account_log.info("no balance")
+
     def get_address(self, asset):
+        addr = ''
         if asset.chain == 'ETH':
             addr = self.eth.get_address()
         elif asset.chain == 'BNB':
             addr = self.bnb_dex.get_address()
         elif asset.chain == 'THOR':
             addr = self.thor.get_address()
+        elif asset.chain == 'LTC':
+            addr = self.ltc.get_address()
         return addr
