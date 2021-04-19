@@ -15,5 +15,4 @@ def generate_mnemonic(language, filename):
     output.close()
     return words
 
-
 generate_mnemonic("english", "secret/real_mnemonic")

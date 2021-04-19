@@ -28,6 +28,7 @@ class ThorOracle:
         'ETH': 15,
         'THOR': 5,
         'LTC': 120,
+        'BCH': 300,
     }
     GAS_MULTIPLIER = {
         'ETH': 35000, # USUAL TX SIZE: 250 BYTES, check contract address

@@ -5,11 +5,10 @@ import os
 
 class DB:
     def __init__(self):
-        mongo_token = 'Gunx9M2O5yUgSYuR'
-        self.client = MongoClient(f'mongodb+srv://telegram:{mongo_token}@cluster0.0y6u7.mongodb.net/thonder?retryWrites=true&w=majority')
+        self.client = MongoClient(open("secret/mongodb", 'r').read())
         self.db = self.client.arb
 
-    def insert_balance_diff(self, balance_diff):
+    def insert_balance_diff(self, tx):
         result = self.db.balances.insert_one(balance_diff)
 
     def insert_tx(self, tx):

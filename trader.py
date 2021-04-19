@@ -23,6 +23,7 @@ class FTXTrader:
         self.precision = {'RUNE': 1}
         self.market = []
         self.logistics = defaultdict(list)
+        self.backlog = []
 
     async def statement(self):
         # ----------------- FTX
@@ -41,6 +42,9 @@ class FTXTrader:
 
     async def get_deposit_address(self, symbol):
         deposit_address = await self.account.fetch_deposit_address(symbol)
+        deposit_address = deposit_address['address']
+        if symbol == 'BCH':
+            return deposit_address.split(':')[1]
         FTX_TRADER_log.info(f'returning deposit address for {symbol}: {deposit_address}')
         return deposit_address
 
@@ -68,9 +72,9 @@ class FTXTrader:
             book = await self.account.fetch_order_book(pair, depth)
             bids = await self.get_book(book['bids'], depth, threshold)
             asks = await self.get_book(book['asks'], depth, threshold)
-            FTX_TRADER_log.debug(f'pair: {pair}'
-                                 f'bids: {bids}'
-                                 f'asks: {asks}')
+            FTX_TRADER_log.debug(f'pair: {pair} '
+                                 f'bids: {bids} '
+                                 f'asks: {asks} \n')
             return bids, asks
         except RequestTimeout as e:
             FTX_TRADER_log.debug('Request timeout calling self.ftx.fetch_order_book: {e}')
@@ -91,73 +95,38 @@ class FTXTrader:
             precision = p['precision']['amount']
             self.logistics[quote_asset].append((quote, precision))
 
-    async def estimate_output(self, pair, amount, side):
-        bids, asks = await self.get_depth(pair, 15, amount*1.5)
+    async def estimate_output(self, pair, amount, side, depth=10):
+        bids, asks = await self.get_depth(pair, depth, amount*1.5)
         FTX_TRADER_log.info(f'estimating output for pair: {pair} '
                             f'direction {side}\n')
-        if side == 'sell':
+        if side == 'buy':
             o_price = asks[0]
             o_volume = asks[1]
-            for i in range(15):
+            for i in range(depth):
                 if o_volume[i] > amount:
+                    output = amount / o_price[i]
+                    FTX_TRADER_log.info(f'FTX: {amount} base = {output} quote')
+                    return output
+            return 0
+        elif side == 'sell':
+            o_price = bids[0]
+            o_volume = bids[1]
+            for i in range(depth):
+                if o_volume[i] * o_price[i] > amount:
                     output = amount * o_price[i]
                     FTX_TRADER_log.info(f'FTX: {amount} quote = {output} base')
                     return output
+            return 0
         else:
-            o_price = bids[0]
-            o_volume = bids[1]
-            for i in range(15):
-                if o_volume[i] * o_price[i] > amount:
-                    output = amount / o_price[i]
-                    FTX_TRADER_log.info(f'FTX: {amount} base = {output} quote')
-                    return amount / o_price[i]
+            return 0
 
 
-    # async def logic(self, pair, depth=5, threshold=0.1, direction='bi'):
-    #     # trading logic between ftx and thorchain
-    #     # get Asset/Rune Price on ftx, calculate route
-    #     # get Asset/Rune Price on thor
-    #     # compare price and execute swap and cex route
-    #
-    #     rune_bids, rune_asks = await self.account.ftx.get_depth(pair='RUNE/USD', depth=depth, threshold=200)
-    #     asset_bids, asset_asks = await self.account.ftx.get_depth(pair=pair, depth=depth, threshold=threshold)
-    #     for i in range(depth):
-    #         bid_price = asset_bids[0][0]
-    #         bid_volume = self.round_down(asset_bids[0][1], self.precision["RUNE"])
-    #
-    #         out_volume_order = self.round_down(oracle_out_volume[i], 1)
-    #         in_volume = out_price * float(out_volume_order)
-    #         out_volume_real = oracle_out_volume[i] / fee
-    #         # book: asset -> rune
-    #         arb_logger.debug(
-    #             f'book: {in_volume} {asset} := {out_volume_real} RUNE '
-    #             f'RUNE market ask price := {out_price}')
-    #         # pool: rune -> asset
-    #         route = self.pool.get_swap_memo(self.BNB_BUSD, 'sell', amount=out_volume_real,
-    #                                         limit=in_volume)
-    #         expected = route[0]
-    #         optimal_slice = route[1]
-    #         optimal_expected = route[2]
-    #         pool_address = route[3]
-    #         memo = route[4]
-    #         arb_logger.debug(
-    #             f'pool: {out_volume_real} RUNE := {expected} {asset}')
-    #         arb_logger.debug(f'{memo}')
-    #         diff = expected - in_volume
-    #         if diff > 1.3:
-    #             arb_logger.error(f'profit: {diff}')
-    #             ftx_order = self.ftx.create_order(symbol=f'RUNE/{asset}', side='buy', amount=out_volume_order, price=out_price, type='limit')
-    #             tx_hash = self.thor_swap(self.pool.rune, float(out_volume_real), pool_address, memo)
-    #             self.pool.get_tx_in(tx_hash=tx_hash)
-    #             database.insert_tx({'thorchain': tx_hash, 'ftx': ftx_order['id']})
-    #             break
-    #         else:
-    #             arb_logger.warning(f'profit: {diff}')
-    #             time.sleep(0.2)
-    #
 
-    # def execute(self):
-    #     address = self.thor.get_inbound_addresses()
+    # async def swap(self, pair, side, amount):
+    #     ## TODO
+    #     # use perp contract to execute order in real time
+    #     order_id = self.account.create_market_order(symbol=pair, side=side, amount=amount)
+    #     #if
 
 
 class THORTrader:
@@ -179,7 +148,7 @@ class THORTrader:
         )
         return output_after_fee
 
-    async def swap(self, in_amount, in_coin: Asset, out_coin: Asset, wait=True, dest_addr=None):
+    async def swap(self, in_amount, in_coin: Asset, out_coin: Asset, dest_addr=None, wait=True):
         vault_addr = self.oracle.get_inbound_addresses(chain=in_coin.chain)
         if not dest_addr:
             dest_addr = self.account.get_address(asset=out_coin)
@@ -192,15 +161,15 @@ class THORTrader:
         )
         out_tx = self.oracle.get_swap_out_tx(tx_id=in_tx, block_time=self.oracle.BLOCKTIME[in_coin.chain])
         if out_tx:
-            # if not wait:
-            #     f'not waiting mode - out_tx : {out_tx}'
-            #     return out_tx
-            # else:
-            THOR_TRADER_log.debug(f'waiting mode - out_tx : {out_tx}')
-            if out_coin.chain == 'THOR':
-                return self.oracle.get_action_by_tx(in_tx, block_time=self.oracle.BLOCKTIME[out_coin.chain])
+            if not wait:
+                THOR_TRADER_log.info(f'not waiting mode - out_tx : {out_tx}')
+                return out_tx
             else:
-                return self.oracle.get_action_by_tx(out_tx, block_time=self.oracle.BLOCKTIME[out_coin.chain])
+                THOR_TRADER_log.debug(f'waiting mode - out_tx : {out_tx}')
+                if out_coin.chain == 'THOR':
+                    return self.oracle.get_action_by_tx(in_tx, block_time=self.oracle.BLOCKTIME[out_coin.chain])
+                else:
+                    return self.oracle.get_action_by_tx(out_tx, block_time=self.oracle.BLOCKTIME[out_coin.chain])
         else:
             THOR_TRADER_log.error(
                 f'tx_in {in_tx} failed'
@@ -231,9 +200,15 @@ loop.run_until_complete(ftx.statement())
 
 ## ARBING BLOCK
 baseAsset = Asset.from_str('BNB.BUSD-BD1')
-interested_pair = ['BNB.BNB', 'ETH.ETH', 'ETH.SUSHI-0X6B3595068778DD592E39A122F4F5A5CF09C90FE2', 'LTC.LTC']
-interested_pair = ['LTC.LTC']
+
+# ## Withdraw from FTX
+# fa = '248898'
+# result = loop.run_until_complete(ftx.withdraw(asset='BUSD', amount=4165, addr=T.account.get_address(baseAsset), two_fa=fa))
+
+interested_pair = ['BTC.BTC', 'BCH.BCH', 'BNB.BNB', 'ETH.ETH', 'ETH.SUSHI-0X6B3595068778DD592E39A122F4F5A5CF09C90FE2', 'LTC.LTC']
+interested_pair = ['LTC.LTC', 'BCH.BCH']
 found = 0
+watch_only = False
 while found == 0:
     time.sleep(0.5)
     for target in interested_pair:
@@ -243,31 +218,43 @@ while found == 0:
             symbol = target.symbol.split('-')[0]
         thor_ins = range(400, 800, 100)
         for thor_in in thor_ins:
-            # # USD -> ALT
-            thor_out = T.estimate_swap_output(in_amount=thor_in, in_coin=baseAsset, out_coin=target)
-            ftx_out = loop.run_until_complete(ftx.estimate_output(pair=f'{symbol}/USD', amount=thor_out, side='sell'))
-            if ftx_out > thor_in + 4:
-                print("arbing opportunity")
-                #found = 1
-                addr = loop.run_until_complete(ftx.get_deposit_address(symbol=symbol))['address']
-                action_detail = loop.run_until_complete(T.swap(in_amount=thor_in, in_coin=baseAsset, out_coin=target,
-                                                               dest_addr=addr))
-                break
-            # ALT -> USD
-            # thor_in = thor_in / T.oracle.get_fiat_price(asset=target)
-            # thor_out = T.estimate_swap_output(in_amount=thor_in, in_coin=target, out_coin=Asset.from_str('BNB.BUSD-BD1'))
-            # ftx_out = loop.run_until_complete(ftx.estimate_output(pair=f'{symbol}/USD', amount=thor_out, side='buy'))
-            # if ftx_out > thor_in:
-            #     print("arbing opportunity")
+            fast = True
+            while fast is True:
+                fast = False
+                baseBalance = loop.run_until_complete(T.account.get_balance(baseAsset))
+                if float(baseBalance) > thor_in*1.2:
+                    # # USD -> ALT
+                    thor_out = T.estimate_swap_output(in_amount=thor_in, in_coin=baseAsset, out_coin=target)
+                    ftx_out = loop.run_until_complete(ftx.estimate_output(pair=f'{symbol}/USD', amount=thor_out, side='sell'))
+                    if ftx_out == 0:
+                        ftx_out = loop.run_until_complete(ftx.estimate_output(pair=f'{symbol}/USD', amount=thor_out, side='sell', depth=20))
+                    if ftx_out > thor_in + 5:
+                        THOR_TRADER_log.warning("arbing opportunity-----------------------------")
+                        if watch_only is False:
+                            # found = 1
+                            if symbol == 'LTC' or symbol == 'BCH':
+                                addr = loop.run_until_complete(ftx.get_deposit_address(symbol=symbol))
+                                action_detail = loop.run_until_complete(T.swap(in_amount=thor_in, in_coin=baseAsset, out_coin=target,
+                                                                               dest_addr=addr, wait=False))
+                                fast=True
+                            else:
+                                break
+#                 else:
+#                     print("no balance")
+#                     time.sleep(10)
+#                     found = 1
+#                     break
+#             # ALT -> USD
+#             # thor_in = thor_in / T.oracle.get_fiat_price(asset=target)
+#             # thor_out = T.estimate_swap_output(in_amount=thor_in, in_coin=target, out_coin=Asset.from_str('BNB.BUSD-BD1'))
+#             # ftx_out = loop.run_until_complete(ftx.estimate_output(pair=f'{symbol}/USD', amount=thor_out, side='buy'))
+#             # if ftx_out > thor_in:
+#             #     print("arbing opportunity")
 
 ## TODO
-## ADD BALANCE CHECK MODULE, ADD AUTO-DEPOSIT AND AUTO-WITHDRAWL FROM FTX
-## ADD FTX SIDE OF TRANSACITON
+## ADD BALANCE CHECK MODULE, ADD AUTO-DEPOSIT AND AUTO-WITHDRAWL FROM FTX [without disturbing the working flow]
+## ADD FTX SIDE OF TRANSACITON, ADD DATABASE MODULE
 
-
-# ## Withdraw from FTX
-# fa = '593553'
-# result = loop.run_until_complete(ftx.withdraw(asset='BNB', amount=0.15, addr=T.account.get_address(baseAsset), two_fa=fa))
 
 # Finishing Part
 # loop.run_until_complete(T.account.bnb_dex.purge_client())

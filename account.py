@@ -72,17 +72,17 @@ class Account:
         # ----------------- Binance Dex
         balances = await self.bnb_dex.get_balance()
         address = self.bnb_dex.get_address()
-        if balance:
+        if balances:
             for balance in balances:
                 account_log.info(f'BNB DEX asset: {balance.asset} amount:{balance.amount}')
         else:
             account_log.info("no balance")
         account_log.info(f'address: {address}')
         # ----------------- THOR
-        balance = await self.thor.get_balance()
-        address = self.thor.get_address()
-        account_log.info(f'THOR balance: {balance}')
-        account_log.info(f'address: {address}')
+        # balance = await self.thor.get_balance()
+        # address = self.thor.get_address()
+        # account_log.info(f'THOR balance: {balance}')
+        # account_log.info(f'address: {address}')
 
     async def thor_swap(self, asset: Asset, amount, recipient, memo):
         tx = ''
@@ -121,6 +121,15 @@ class Account:
         elif asset.chain == 'BNB':
             tx_detail = self.bnb_dex.get_transaction_data(tx_id)
             return tx_detail
+
+    async def get_balance(self, asset):
+        if asset.chain == 'BNB':
+            balances = await self.bnb_dex.get_balance(asset=asset)
+            if balances:
+                account_log.info(f'BNB DEX asset: {balances[0].asset} amount:{balances[0].amount}')
+                return balances[0].amount
+            else:
+                account_log.info("no balance")
 
     def get_address(self, asset):
         addr = ''
