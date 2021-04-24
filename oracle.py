@@ -278,7 +278,7 @@ class ThorOracle:
         pool2_data = next(filter(lambda pools: pools["asset"] == out_asset, depth))
         return doubleswap_output(int(in_amount*10**8), pool1_data, pool2_data)/10**8
 
-    def get_swap_out_tx(self, tx_id, block_time=1, timeout=300):
+    def get_thornode_tx_detail(self, tx_id, block_time=1, timeout=300):
         """Return out_hash of swap, checked that the out_tx has valid status"""
         thornode_log.info(f'looking up tx: {tx_id} block_time: {block_time} timeout: {timeout}')
         i = 0
@@ -293,9 +293,8 @@ class ThorOracle:
                         thornode_log.info(f'status: {status}')
                         if status == 'done':
                             thornode_log.info(f'{tx_detail["tx"]["memo"]} success')
-                            tx_out = tx_detail["out_hashes"][0]
                             thornode_log.info(f'complete in_tx: {tx_detail}')
-                            return tx_out
+                            return tx_detail
                         elif status == 'refund':
                             return False
                     else:
@@ -354,7 +353,7 @@ class ThorOracle:
                 midgard_log.debug(f'ip {self.seeds[0]} 10 block_time have passed')
                 bytes = ''
         midgard_log.info(f'action detail: {action}')
-        return action
+        return action.actions[0]
 
 
 class FtxOracle:

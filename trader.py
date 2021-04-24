@@ -11,6 +11,7 @@ FTX_TRADER_log = get_logger("FTX:TRADER", level=logging.DEBUG)
 import ccxt.async_support as ccxt
 from ccxt.base.errors import RequestTimeout
 import time
+from database import DB
 
 
 class FTXTrader:
@@ -128,6 +129,9 @@ class FTXTrader:
     #     order_id = self.account.create_market_order(symbol=pair, side=side, amount=amount)
     #     #if
 
+    # check backlog of orders to be executed, if there's enough ltc or bch to execute the trade, do it inmediately, otherwise wait until balance
+    # send usd to wallet in some times
+
 
 class THORTrader:
     op_code = {"ADD": '+', "WITHDRAW": '-', "SWAP": '=', "DONATE": '%'}
@@ -135,6 +139,7 @@ class THORTrader:
     def __init__(self, host=None, network=None):
         self.oracle = ThorOracle(host=host, network=network)
         self.account = Account()
+        self.db = DB(cred=open("secret/mongodb", 'r').read())
 
     def estimate_swap_output(self, in_amount, in_coin: Asset, out_coin: Asset):
         output_before_fee = self.oracle.get_swap_output(in_amount, str(in_coin), str(out_coin))
@@ -159,11 +164,12 @@ class THORTrader:
             f'memo: {memo}\n'
             f'in_tx: {in_tx}'
         )
-        out_tx = self.oracle.get_swap_out_tx(tx_id=in_tx, block_time=self.oracle.BLOCKTIME[in_coin.chain])
+        in_tx_detail = self.oracle.get_thornode_tx_detail(tx_id=in_tx, block_time=self.oracle.BLOCKTIME[in_coin.chain])
+        out_tx = in_tx_detail["out_hashes"][0]
         if out_tx:
             if not wait:
                 THOR_TRADER_log.info(f'not waiting mode - out_tx : {out_tx}')
-                return out_tx
+                return in_tx_detail
             else:
                 THOR_TRADER_log.debug(f'waiting mode - out_tx : {out_tx}')
                 if out_coin.chain == 'THOR':
@@ -201,9 +207,9 @@ loop.run_until_complete(ftx.statement())
 ## ARBING BLOCK
 baseAsset = Asset.from_str('BNB.BUSD-BD1')
 
-# ## Withdraw from FTX
-# fa = '248898'
-# result = loop.run_until_complete(ftx.withdraw(asset='BUSD', amount=4165, addr=T.account.get_address(baseAsset), two_fa=fa))
+## Withdraw from FTX
+# fa = '004624'
+# result = loop.run_until_complete(ftx.withdraw(asset='BUSD', amount=4795, addr=T.account.get_address(baseAsset), two_fa=fa))
 
 interested_pair = ['BTC.BTC', 'BCH.BCH', 'BNB.BNB', 'ETH.ETH', 'ETH.SUSHI-0X6B3595068778DD592E39A122F4F5A5CF09C90FE2', 'LTC.LTC']
 interested_pair = ['LTC.LTC', 'BCH.BCH']
@@ -236,6 +242,8 @@ while found == 0:
                                 addr = loop.run_until_complete(ftx.get_deposit_address(symbol=symbol))
                                 action_detail = loop.run_until_complete(T.swap(in_amount=thor_in, in_coin=baseAsset, out_coin=target,
                                                                                dest_addr=addr, wait=False))
+                                action_detail['expected_out'] = thor_out
+                                T.db.insert_thornode_action(action=action_detail)
                                 fast=True
                             else:
                                 break

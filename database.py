@@ -1,42 +1,22 @@
 from pymongo import MongoClient
 from datetime import datetime
 import os
-
+import json
 
 class DB:
-    def __init__(self):
-        self.client = MongoClient(open("secret/mongodb", 'r').read())
+    def __init__(self, cred):
+        self.client = MongoClient(cred)
         self.db = self.client.arb
+        self.thortrader = self.db.thortrader
+        self.ftxtrader = self.db.ftxtrader
 
-    def insert_balance_diff(self, tx):
-        result = self.db.balances.insert_one(balance_diff)
-
-    def insert_tx(self, tx):
-        result = self.db.txs.insert_one(tx)
-
-    def get_txs(self):
-        txs = self.db.txs.find()
-        return txs
-
-    def get_unaccounted_txs(self):
-        txs = self.db.txs.find({'status': None})
-        return txs
-
-    def add_profit_txs(self, id, usd_gain, rune_gain, status):
-        result = self.db.txs.update_one({'_id': id}, {'$set': {'usd_gain': usd_gain, 'rune_gain': rune_gain, 'status': status}}, upsert=True)
-        return result
-
-    def add_timestamp(self):
-        time = datetime.now()
-        with open('timestamp.txt', 'r+') as f:
-            lastime = f.readlines()
-            if lastime:
-                print(f'last time was {lastime}')
-            else:
-                print(f'last time was {time}')
-            f.write(str(time))
-        f.close()
-
-    def get_failed_txs(self):
-        txs = self.db.txs.find({'status': {'$ne': 'success'}})
-        return txs
+    def insert_midgard_action(self, action):
+        result = self.thortrader.insert_one(action.to_dict())
+        assert result.acknowledged
+        # result = self.ftxtrader.insert_one(action.to_dict())
+        #
+    def insert_thornode_action(self, action):
+        result = self.thortrader.insert_one(action)
+        assert result.acknowledged
+    #
+    # def insert_ftx_action(self, action):
