@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from datetime import datetime
 import os
 import json
+from datetime import datetime
 
 class DB:
     def __init__(self, cred):
@@ -10,13 +11,45 @@ class DB:
         self.thortrader = self.db.thortrader
         self.ftxtrader = self.db.ftxtrader
 
-    def insert_midgard_action(self, action):
-        result = self.thortrader.insert_one(action.to_dict())
-        assert result.acknowledged
-        # result = self.ftxtrader.insert_one(action.to_dict())
-        #
-    def insert_thornode_action(self, action):
+    def post_action(self, action):
         result = self.thortrader.insert_one(action)
-        assert result.acknowledged
-    #
-    # def insert_ftx_action(self, action):
+        return result
+
+    def post_filtered_action(self, action, additional=None):
+        tx = {}
+        tx['in_asset'] = action['tx']['coins'][0]['asset']
+        tx['in_amount'] = float(action['tx']['coins'][0]['amount'])
+        tx['gas_asset'] = action['tx']['gas'][0]['asset']
+        tx['gas_amount'] = float(action['tx']['gas'][0]['amount'])
+        tx["time"] = datetime.now()
+        if additional:
+            tx.update(additional)
+        result = self.ftxtrader.insert_one(tx)
+        return result
+
+    def get_action(self):
+        result = self.thortrader.find_one()
+        return result
+
+    def get_filtered_action(self, filter=None):
+        if filter:
+            result = self.ftxtrader.find_one(filter)
+        else:
+            result = self.ftxtrader.find_one()
+        return result
+
+    def delete_action(self, filter):
+        result = self.thortrader.delete_one(filter)
+        return result
+
+    def delete_filtered_action(self, filter):
+        result = self.ftxtrader.delete_one(filter)
+        return result
+
+    def delete_collection(self):
+        result = self.ftxtrader.drop()
+        return result
+
+    def update_collection(self, filter, update):
+        result = self.ftxtrader.update_one(filter=filter, update={"$set": update})
+        return result

@@ -68,6 +68,8 @@ class ThorOracle:
             user_log.debug(f'host input: {host}')
         self.inbound_addresses = []
         self.seeds = self.get_seed()
+        ## TODO
+        ## get_seed() can return None
         thornode_log.debug(f'Network: {self.seed_service} Seeds collected: {self.seeds}')
         self.seed_time = datetime.utcnow()
         self.depths = self.parse_depth()
