@@ -1,8 +1,6 @@
 from pymongo import MongoClient
 from datetime import datetime
-import os
-import json
-from datetime import datetime
+
 
 class DB:
     def __init__(self, cred):
@@ -17,6 +15,7 @@ class DB:
 
     def post_filtered_action(self, action, additional=None):
         tx = {}
+        tx['tx_id'] = action['tx']['id']
         tx['in_asset'] = action['tx']['coins'][0]['asset']
         tx['in_amount'] = float(action['tx']['coins'][0]['amount'])
         tx['gas_asset'] = action['tx']['gas'][0]['asset']

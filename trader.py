@@ -12,6 +12,7 @@ import ccxt.async_support as ccxt
 from ccxt.base.errors import RequestTimeout
 from ccxt.base.decimal_to_precision import decimal_to_precision, number_to_string, TRUNCATE
 import time
+import pyotp
 from database import DB
 MONGO = DB(cred=open("secret/mongodb", 'r').read())
 
@@ -21,8 +22,9 @@ class FTXTrader:
                                     'secret': f'{open("secret/ftx_api_secret.txt").read()}',
                                     'enableRateLimit': True,
                                     'headers': {'FTX-SUBACCOUNT': 'arb'}})
+        self.otp = pyotp.TOTP(open("secret/ftx_otp.txt").read());
         # self.thor = ThorOracle()
-        self.precision = {'LTC': 2}
+        self.precision = {'LTC': 2, 'BCH': 3, 'ETH': 3}
         self.market = []
         self.logistics = defaultdict(list)
         self.backlog = []
@@ -31,7 +33,7 @@ class FTXTrader:
         balance = await self.account.fetch_balance()
         if symbol:
             if symbol in balance:
-                balance = balance[symbol]['free']
+                balance = float(balance[symbol]['free'])
             else:
                 balance = 0
         return balance
@@ -43,7 +45,8 @@ class FTXTrader:
         FTX_TRADER_log.info(f'FTX balance: {balance}')
         FTX_TRADER_log.info(f'DEPOSIT ADDRESS: {deposit_address}')
 
-    async def withdraw(self, asset, amount, addr, two_fa):
+    async def withdraw(self, asset, amount, addr):
+        two_fa = self.otp.now()
         params = {'code': two_fa}
         FTX_TRADER_log.info(f'FTX:WITHDRAW:{asset}:{amount}:{addr}')
         result = await self.account.withdraw(code=asset, amount=amount, address=addr, params=params)
@@ -78,16 +81,17 @@ class FTXTrader:
         return o_price, o_volume
 
     async def get_depth(self, pair, depth, threshold):
-        try:
-            book = await self.account.fetch_order_book(pair, depth)
-            bids = await self.get_book(book['bids'], depth, threshold)
-            asks = await self.get_book(book['asks'], depth, threshold)
-            FTX_TRADER_log.debug(f'pair: {pair} '
-                                 f'bids: {bids} '
-                                 f'asks: {asks} \n')
-            return bids, asks
-        except RequestTimeout as e:
-            FTX_TRADER_log.debug('Request timeout calling self.ftx.fetch_order_book: {e}')
+        while True:
+            try:
+                book = await self.account.fetch_order_book(pair, depth)
+                bids = await self.get_book(book['bids'], depth, threshold)
+                asks = await self.get_book(book['asks'], depth, threshold)
+                FTX_TRADER_log.debug(f'pair: {pair} '
+                                     f'bids: {bids} '
+                                     f'asks: {asks} \n')
+                return bids, asks
+            except RequestTimeout as e:
+                FTX_TRADER_log.debug('Request timeout calling self.ftx.fetch_order_book: {e}')
 
     def round_down(self, number, precision):
         return decimal_to_precision(number_to_string(number), TRUNCATE, precision)
