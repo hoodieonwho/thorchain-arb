@@ -1,5 +1,6 @@
 from mnemonic import Mnemonic
 
+
 def generate_mnemonic(language, filename):
     """Generate test_suite using user-specified language and save to local file
     :param language: language of test_suite words

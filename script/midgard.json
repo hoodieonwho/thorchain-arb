@@ -216,16 +216,6 @@
 					}
 				},
 				"description": "Swap count, volume, fee and slip history"
-			},
-			"TVLHistoryResponse": {
-				"content": {
-					"application/json": {
-						"schema": {
-							"$ref": "#/components/schemas/TVLHistory"
-						}
-					}
-				},
-				"description": "Total pool depths, total bonds, and total value locked history"
 			}
 		},
 		"schemas": {
@@ -925,10 +915,18 @@
 				"type": "object"
 			},
 			"Lastblock": {
-				"items": {
-					"$ref": "#/components/schemas/LastblockItem"
+				"properties": {
+					"current": {
+						"items": {
+							"$ref": "#/components/schemas/LastblockItem"
+						},
+						"type": "array"
+					}
 				},
-				"type": "array"
+				"required": [
+					"current"
+				],
+				"type": "object"
 			},
 			"LastblockItem": {
 				"properties": {
@@ -2098,62 +2096,6 @@
 				],
 				"type": "object"
 			},
-			"TVLHistory": {
-				"properties": {
-					"intervals": {
-						"$ref": "#/components/schemas/TVLHistoryIntervals"
-					},
-					"meta": {
-						"$ref": "#/components/schemas/TVLHistoryItem"
-					}
-				},
-				"required": [
-					"meta",
-					"intervals"
-				],
-				"type": "object"
-			},
-			"TVLHistoryIntervals": {
-				"items": {
-					"$ref": "#/components/schemas/TVLHistoryItem"
-				},
-				"type": "array"
-			},
-			"TVLHistoryItem": {
-				"properties": {
-					"endTime": {
-						"description": "Int64, The end time of bucket in unix timestamp",
-						"type": "string"
-					},
-					"runePriceUSD": {
-						"description": "Float, the price of Rune based on the deepest USD pool at the end of the interval.\n",
-						"type": "string"
-					},
-					"startTime": {
-						"description": "Int64, The beginning time of bucket in unix timestamp",
-						"type": "string"
-					},
-					"totalValueBonded": {
-						"description": "Int64(e8), the total amount of bonds (both active and standby) at the end of the interval",
-						"type": "string"
-					},
-					"totalValueLocked": {
-						"description": "Int64(e8), total value locked in the chain (in rune)\nThis equals `totalPooledValue + totalBondedValue`, as it combines the liquidity pools and bonds of the nodes.\n",
-						"type": "string"
-					},
-					"totalValuePooled": {
-						"description": "Int64(e8) in rune, the total pooled value (both assets and rune) in all of the pools at the end of the interval\nNote: this is twice the aggregate Rune depth of all pools.\n",
-						"type": "string"
-					}
-				},
-				"required": [
-					"startTime",
-					"endTime",
-					"totalValuePooled",
-					"runePriceUSD"
-				],
-				"type": "object"
-			},
 			"Transaction": {
 				"description": "Transaction data",
 				"properties": {
@@ -2210,7 +2152,7 @@
 		},
 		"description": "The Midgard Public API queries THORChain and any chains linked via the Bifröst and prepares information about the network to be readily available for public users. The API parses transaction event data from THORChain and stores them in a time-series database to make time-dependent queries easy. Midgard does not hold critical information. To interact with BEPSwap and Asgardex, users should query THORChain directly.",
 		"title": "Midgard Public API",
-		"version": "2.1.0"
+		"version": "2.0.1"
 	},
 	"openapi": "3.0.0",
 	"paths": {
@@ -2581,67 +2523,6 @@
 					}
 				},
 				"summary": "Swaps History"
-			}
-		},
-		"/v2/history/tvl": {
-			"get": {
-				"description": "Returns total pool depths, total bonds, and total value locked in specified interval.\n\nTotal Value Locked = Total Bonds + 2 * Total Pool Depths\n\nHistory endpoint has two modes:\n* With Interval parameter it returns a series of time buckets. From and To dates will\n  be rounded to the Interval boundaries.\n* Without Interval parameter a single From..To search is performed with exact timestamps.\n\n* Interval: possible values: 5min, hour, day, week, month, quarter, year.\n* count: [1..400]. Defines number of intervals. Don't provide if Interval is missing.\n* from/to: optional int, unix second.\n\nPossible usages with interval.\n* last 10 days: `?interval=day\u0026count=10`\n* last 10 days before to: `?interval=day\u0026count=10\u0026to=1608825600`\n* next 10 days after from: `?interval=day\u0026count=10\u0026from=1606780800`\n* Days between from and to. From defaults to start of chain, to defaults to now.\n  Only the first 400 intervals are returned:\n  `interval=day\u0026from=1606780800\u0026to=1608825600`\n\nPagination is possible with from\u0026count and then using the returned meta.endTime as the\nFrom parameter of the next query.\n\nPossible configurations without interval:\n* exact search for one time frame: `?from=1606780899\u0026to=1608825600`\n* one time frame until now: `?from=1606780899`\n* from chain start until now: no query parameters\n",
-				"operationId": "GetTVLHistory",
-				"parameters": [
-					{
-						"description": "Interval of calculations",
-						"example": "day",
-						"in": "query",
-						"name": "interval",
-						"schema": {
-							"enum": [
-								"5min",
-								"hour",
-								"day",
-								"week",
-								"month",
-								"quarter",
-								"year"
-							],
-							"type": "string"
-						}
-					},
-					{
-						"description": "Number of intervals to return. Should be between [1..400].",
-						"example": 30,
-						"in": "query",
-						"name": "count",
-						"schema": {
-							"type": "integer"
-						}
-					},
-					{
-						"description": "End time of the query as unix timestamp. If only count is given, defaults to now.",
-						"example": 1608825600,
-						"in": "query",
-						"name": "to",
-						"schema": {
-							"format": "int64",
-							"type": "integer"
-						}
-					},
-					{
-						"description": "Start time of the query as unix timestamp",
-						"example": 1606780800,
-						"in": "query",
-						"name": "from",
-						"schema": {
-							"format": "int64",
-							"type": "integer"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"$ref": "#/components/responses/TVLHistoryResponse"
-					}
-				},
-				"summary": "Total Value Locked History"
 			}
 		},
 		"/v2/member/{address}": {

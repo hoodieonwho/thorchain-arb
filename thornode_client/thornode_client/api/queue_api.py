@@ -34,7 +34,7 @@ class QueueApi(object):
         self.api_client = api_client
 
     def get_outbound_queue(self, **kwargs):  # noqa: E501
-        """Get outbound queue  # noqa: E501
+        """get outbound queue  # noqa: E501
 
         Retrieve the outbound queue information from THORChain  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
@@ -55,7 +55,7 @@ class QueueApi(object):
             return data
 
     def get_outbound_queue_with_http_info(self, **kwargs):  # noqa: E501
-        """Get outbound queue  # noqa: E501
+        """get outbound queue  # noqa: E501
 
         Retrieve the outbound queue information from THORChain  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
@@ -121,9 +121,9 @@ class QueueApi(object):
             collection_formats=collection_formats)
 
     def get_outbound_queue_detail(self, **kwargs):  # noqa: E501
-        """Get outbound queue detail  # noqa: E501
+        """get outbound queue detail  # noqa: E501
 
-        Get the list of tx out items in the queue  # noqa: E501
+        get the list of tx out item in the queue  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_outbound_queue_detail(async_req=True)
@@ -142,9 +142,9 @@ class QueueApi(object):
             return data
 
     def get_outbound_queue_detail_with_http_info(self, **kwargs):  # noqa: E501
-        """Get outbound queue detail  # noqa: E501
+        """get outbound queue detail  # noqa: E501
 
-        Get the list of tx out items in the queue  # noqa: E501
+        get the list of tx out item in the queue  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_outbound_queue_detail_with_http_info(async_req=True)

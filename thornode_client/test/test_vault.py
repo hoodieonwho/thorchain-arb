@@ -16,12 +16,12 @@ from __future__ import absolute_import
 import unittest
 
 import thornode_client
-from thornode_client.models.asgard_vault import AsgardVault  # noqa: E501
+from thornode_client.models.vault import Vault  # noqa: E501
 from thornode_client.rest import ApiException
 
 
-class TestAsgardVault(unittest.TestCase):
-    """AsgardVault unit test stubs"""
+class TestVault(unittest.TestCase):
+    """Vault unit test stubs"""
 
     def setUp(self):
         pass
@@ -29,10 +29,10 @@ class TestAsgardVault(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def testAsgardVault(self):
-        """Test AsgardVault"""
+    def testVault(self):
+        """Test Vault"""
         # FIXME: construct object with mandatory attributes with example values
-        # model = thornode_client.models.asgard_vault.AsgardVault()  # noqa: E501
+        # model = thornode_client.models.vault.Vault()  # noqa: E501
         pass
 
 

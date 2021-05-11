@@ -16,23 +16,31 @@ from __future__ import absolute_import
 import unittest
 
 import thornode_client
-from thornode_client.models.yggdrasil_vault import YggdrasilVault  # noqa: E501
+from thornode_client.api.keygenkeysign_api import KeygenkeysignApi  # noqa: E501
 from thornode_client.rest import ApiException
 
 
-class TestYggdrasilVault(unittest.TestCase):
-    """YggdrasilVault unit test stubs"""
+class TestKeygenkeysignApi(unittest.TestCase):
+    """KeygenkeysignApi unit test stubs"""
 
     def setUp(self):
-        pass
+        self.api = thornode_client.api.keygenkeysign_api.KeygenkeysignApi()  # noqa: E501
 
     def tearDown(self):
         pass
 
-    def testYggdrasilVault(self):
-        """Test YggdrasilVault"""
-        # FIXME: construct object with mandatory attributes with example values
-        # model = thornode_client.models.yggdrasil_vault.YggdrasilVault()  # noqa: E501
+    def test_get_keygen(self):
+        """Test case for get_keygen
+
+        get keygen  # noqa: E501
+        """
+        pass
+
+    def test_get_keysign(self):
+        """Test case for get_keysign
+
+        Get keysign  # noqa: E501
+        """
         pass
 
 

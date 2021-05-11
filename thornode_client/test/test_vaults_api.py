@@ -32,28 +32,21 @@ class TestVaultsApi(unittest.TestCase):
     def test_get_a_vault_by_pubkey(self):
         """Test case for get_a_vault_by_pubkey
 
-        Get a vault by pubkey  # noqa: E501
+        get a vault by pubkey  # noqa: E501
         """
         pass
 
-    def test_get_asgard_vaults(self):
-        """Test case for get_asgard_vaults
+    def test_get_all_yggdrasil_vaults(self):
+        """Test case for get_all_yggdrasil_vaults
 
-        Get Asgard vaults  # noqa: E501
+        get all yggdrasil vaults  # noqa: E501
         """
         pass
 
     def test_get_vault_pubkeys(self):
         """Test case for get_vault_pubkeys
 
-        Get vault pubkeys  # noqa: E501
-        """
-        pass
-
-    def test_get_yggdrasil_vaults(self):
-        """Test case for get_yggdrasil_vaults
-
-        Get Yggdrasil vaults  # noqa: E501
+        get vault pubkeys  # noqa: E501
         """
         pass
 

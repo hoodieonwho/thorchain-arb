@@ -15,11 +15,11 @@
 from __future__ import absolute_import
 
 # import models into model package
-from thornode_client.models.asgard_vault import AsgardVault
 from thornode_client.models.chain_address import ChainAddress
 from thornode_client.models.chain_router import ChainRouter
 from thornode_client.models.coin import Coin
 from thornode_client.models.constants import Constants
+from thornode_client.models.get_all_last_block_height import GetAllLastBlockHeight
 from thornode_client.models.inbound_addresses import InboundAddresses
 from thornode_client.models.keygen import Keygen
 from thornode_client.models.keysign import Keysign
@@ -29,11 +29,13 @@ from thornode_client.models.network import Network
 from thornode_client.models.node import Node
 from thornode_client.models.observed_tx import ObservedTx
 from thornode_client.models.outbound_queue import OutboundQueue
+from thornode_client.models.outbound_queue_detail import OutboundQueueDetail
 from thornode_client.models.ping import Ping
 from thornode_client.models.pool import Pool
 from thornode_client.models.ragnarok import Ragnarok
 from thornode_client.models.tx import Tx
-from thornode_client.models.tx_out_item import TxOutItem
 from thornode_client.models.tx_signers import TxSigners
+from thornode_client.models.txoutitem import Txoutitem
+from thornode_client.models.vault import Vault
 from thornode_client.models.version import Version
-from thornode_client.models.yggdrasil_vault import YggdrasilVault
+from thornode_client.models.yggdrasilvault import Yggdrasilvault

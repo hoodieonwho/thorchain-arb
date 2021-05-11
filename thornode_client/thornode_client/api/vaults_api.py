@@ -34,7 +34,7 @@ class VaultsApi(object):
         self.api_client = api_client
 
     def get_a_vault_by_pubkey(self, pubkey, **kwargs):  # noqa: E501
-        """Get a vault by pubkey  # noqa: E501
+        """get a vault by pubkey  # noqa: E501
 
           # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
@@ -56,7 +56,7 @@ class VaultsApi(object):
             return data
 
     def get_a_vault_by_pubkey_with_http_info(self, pubkey, **kwargs):  # noqa: E501
-        """Get a vault by pubkey  # noqa: E501
+        """get a vault by pubkey  # noqa: E501
 
           # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
@@ -128,13 +128,13 @@ class VaultsApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_asgard_vaults(self, **kwargs):  # noqa: E501
-        """Get Asgard vaults  # noqa: E501
+    def get_all_yggdrasil_vaults(self, **kwargs):  # noqa: E501
+        """get all yggdrasil vaults  # noqa: E501
 
-        Retrieve all current active Asgard vaults from thorchain  # noqa: E501
+        Retrieve all yggdrasil vaults from THORChain  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_asgard_vaults(async_req=True)
+        >>> thread = api.get_all_yggdrasil_vaults(async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -144,18 +144,18 @@ class VaultsApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_asgard_vaults_with_http_info(**kwargs)  # noqa: E501
+            return self.get_all_yggdrasil_vaults_with_http_info(**kwargs)  # noqa: E501
         else:
-            (data) = self.get_asgard_vaults_with_http_info(**kwargs)  # noqa: E501
+            (data) = self.get_all_yggdrasil_vaults_with_http_info(**kwargs)  # noqa: E501
             return data
 
-    def get_asgard_vaults_with_http_info(self, **kwargs):  # noqa: E501
-        """Get Asgard vaults  # noqa: E501
+    def get_all_yggdrasil_vaults_with_http_info(self, **kwargs):  # noqa: E501
+        """get all yggdrasil vaults  # noqa: E501
 
-        Retrieve all current active Asgard vaults from thorchain  # noqa: E501
+        Retrieve all yggdrasil vaults from THORChain  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_asgard_vaults_with_http_info(async_req=True)
+        >>> thread = api.get_all_yggdrasil_vaults_with_http_info(async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -175,7 +175,7 @@ class VaultsApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_asgard_vaults" % key
+                    " to method get_all_yggdrasil_vaults" % key
                 )
             params[key] = val
         del params['kwargs']
@@ -200,7 +200,7 @@ class VaultsApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/thorchain/vaults/asgard', 'GET',
+            '/thorchain/vaults/yggdrasil', 'GET',
             path_params,
             query_params,
             header_params,
@@ -216,9 +216,9 @@ class VaultsApi(object):
             collection_formats=collection_formats)
 
     def get_vault_pubkeys(self, **kwargs):  # noqa: E501
-        """Get vault pubkeys  # noqa: E501
+        """get vault pubkeys  # noqa: E501
 
-        Retrieve all vaults public keys  # noqa: E501
+        Retrieve all vaults' public keys  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_vault_pubkeys(async_req=True)
@@ -237,9 +237,9 @@ class VaultsApi(object):
             return data
 
     def get_vault_pubkeys_with_http_info(self, **kwargs):  # noqa: E501
-        """Get vault pubkeys  # noqa: E501
+        """get vault pubkeys  # noqa: E501
 
-        Retrieve all vaults public keys  # noqa: E501
+        Retrieve all vaults' public keys  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
         >>> thread = api.get_vault_pubkeys_with_http_info(async_req=True)
@@ -295,93 +295,6 @@ class VaultsApi(object):
             post_params=form_params,
             files=local_var_files,
             response_type='object',  # noqa: E501
-            auth_settings=auth_settings,
-            async_req=params.get('async_req'),
-            _return_http_data_only=params.get('_return_http_data_only'),
-            _preload_content=params.get('_preload_content', True),
-            _request_timeout=params.get('_request_timeout'),
-            collection_formats=collection_formats)
-
-    def get_yggdrasil_vaults(self, **kwargs):  # noqa: E501
-        """Get Yggdrasil vaults  # noqa: E501
-
-        Retrieve all Yggdrasil vaults from THORChain  # noqa: E501
-        This method makes a synchronous HTTP request by default. To make an
-        asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_yggdrasil_vaults(async_req=True)
-        >>> result = thread.get()
-
-        :param async_req bool
-        :return: list[object]
-                 If the method is called asynchronously,
-                 returns the request thread.
-        """
-        kwargs['_return_http_data_only'] = True
-        if kwargs.get('async_req'):
-            return self.get_yggdrasil_vaults_with_http_info(**kwargs)  # noqa: E501
-        else:
-            (data) = self.get_yggdrasil_vaults_with_http_info(**kwargs)  # noqa: E501
-            return data
-
-    def get_yggdrasil_vaults_with_http_info(self, **kwargs):  # noqa: E501
-        """Get Yggdrasil vaults  # noqa: E501
-
-        Retrieve all Yggdrasil vaults from THORChain  # noqa: E501
-        This method makes a synchronous HTTP request by default. To make an
-        asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_yggdrasil_vaults_with_http_info(async_req=True)
-        >>> result = thread.get()
-
-        :param async_req bool
-        :return: list[object]
-                 If the method is called asynchronously,
-                 returns the request thread.
-        """
-
-        all_params = []  # noqa: E501
-        all_params.append('async_req')
-        all_params.append('_return_http_data_only')
-        all_params.append('_preload_content')
-        all_params.append('_request_timeout')
-
-        params = locals()
-        for key, val in six.iteritems(params['kwargs']):
-            if key not in all_params:
-                raise TypeError(
-                    "Got an unexpected keyword argument '%s'"
-                    " to method get_yggdrasil_vaults" % key
-                )
-            params[key] = val
-        del params['kwargs']
-
-        collection_formats = {}
-
-        path_params = {}
-
-        query_params = []
-
-        header_params = {}
-
-        form_params = []
-        local_var_files = {}
-
-        body_params = None
-        # HTTP header `Accept`
-        header_params['Accept'] = self.api_client.select_header_accept(
-            ['application/json'])  # noqa: E501
-
-        # Authentication setting
-        auth_settings = []  # noqa: E501
-
-        return self.api_client.call_api(
-            '/thorchain/vaults/yggdrasil', 'GET',
-            path_params,
-            query_params,
-            header_params,
-            body=body_params,
-            post_params=form_params,
-            files=local_var_files,
-            response_type='list[object]',  # noqa: E501
             auth_settings=auth_settings,
             async_req=params.get('async_req'),
             _return_http_data_only=params.get('_return_http_data_only'),

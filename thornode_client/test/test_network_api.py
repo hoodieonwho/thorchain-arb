@@ -29,13 +29,6 @@ class TestNetworkApi(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_get_all_last_block_height(self):
-        """Test case for get_all_last_block_height
-
-        Get all last block height  # noqa: E501
-        """
-        pass
-
     def test_get_constant_values_from_thor_chain(self):
         """Test case for get_constant_values_from_thor_chain
 
@@ -74,7 +67,7 @@ class TestNetworkApi(unittest.TestCase):
     def test_get_ragnarok_status(self):
         """Test case for get_ragnarok_status
 
-        Get Ragnarok status  # noqa: E501
+        Get ragnarok status  # noqa: E501
         """
         pass
 

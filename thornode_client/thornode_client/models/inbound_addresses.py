@@ -37,7 +37,7 @@ class InboundAddresses(object):
         'pub_key': 'str',
         'address': 'str',
         'halted': 'bool',
-        'gas_rate__string___gas_rate_for_eth_it_is_in_gwei_for_btcbchltc_it_is_gas_rate_per_vbyte': 'str'
+        'gas_rate__string___gas_rate_for_eth__it_is_in_gwei__for_btcbchltc_it_is_gas_rate_per_vbyte': 'str'
     }
 
     attribute_map = {
@@ -45,10 +45,10 @@ class InboundAddresses(object):
         'pub_key': 'pub_key',
         'address': 'address',
         'halted': 'halted',
-        'gas_rate__string___gas_rate_for_eth_it_is_in_gwei_for_btcbchltc_it_is_gas_rate_per_vbyte': 'gas_rate (string) - gas rate, for ETH, it is in Gwei, for BTC/BCH/LTC it is gas_rate per vbyte'
+        'gas_rate__string___gas_rate_for_eth__it_is_in_gwei__for_btcbchltc_it_is_gas_rate_per_vbyte': 'gas_rate (string) - gas rate, for ETH , it is in Gwei , for BTC/BCH/LTC it is gas_rate per vbyte'
     }
 
-    def __init__(self, chain=None, pub_key=None, address=None, halted=None, gas_rate__string___gas_rate_for_eth_it_is_in_gwei_for_btcbchltc_it_is_gas_rate_per_vbyte=None, _configuration=None):  # noqa: E501
+    def __init__(self, chain=None, pub_key=None, address=None, halted=None, gas_rate__string___gas_rate_for_eth__it_is_in_gwei__for_btcbchltc_it_is_gas_rate_per_vbyte=None, _configuration=None):  # noqa: E501
         """InboundAddresses - a model defined in Swagger"""  # noqa: E501
         if _configuration is None:
             _configuration = Configuration()
@@ -58,7 +58,7 @@ class InboundAddresses(object):
         self._pub_key = None
         self._address = None
         self._halted = None
-        self._gas_rate__string___gas_rate_for_eth_it_is_in_gwei_for_btcbchltc_it_is_gas_rate_per_vbyte = None
+        self._gas_rate__string___gas_rate_for_eth__it_is_in_gwei__for_btcbchltc_it_is_gas_rate_per_vbyte = None
         self.discriminator = None
 
         if chain is not None:
@@ -69,8 +69,8 @@ class InboundAddresses(object):
             self.address = address
         if halted is not None:
             self.halted = halted
-        if gas_rate__string___gas_rate_for_eth_it_is_in_gwei_for_btcbchltc_it_is_gas_rate_per_vbyte is not None:
-            self.gas_rate__string___gas_rate_for_eth_it_is_in_gwei_for_btcbchltc_it_is_gas_rate_per_vbyte = gas_rate__string___gas_rate_for_eth_it_is_in_gwei_for_btcbchltc_it_is_gas_rate_per_vbyte
+        if gas_rate__string___gas_rate_for_eth__it_is_in_gwei__for_btcbchltc_it_is_gas_rate_per_vbyte is not None:
+            self.gas_rate__string___gas_rate_for_eth__it_is_in_gwei__for_btcbchltc_it_is_gas_rate_per_vbyte = gas_rate__string___gas_rate_for_eth__it_is_in_gwei__for_btcbchltc_it_is_gas_rate_per_vbyte
 
     @property
     def chain(self):
@@ -165,25 +165,25 @@ class InboundAddresses(object):
         self._halted = halted
 
     @property
-    def gas_rate__string___gas_rate_for_eth_it_is_in_gwei_for_btcbchltc_it_is_gas_rate_per_vbyte(self):
-        """Gets the gas_rate__string___gas_rate_for_eth_it_is_in_gwei_for_btcbchltc_it_is_gas_rate_per_vbyte of this InboundAddresses.  # noqa: E501
+    def gas_rate__string___gas_rate_for_eth__it_is_in_gwei__for_btcbchltc_it_is_gas_rate_per_vbyte(self):
+        """Gets the gas_rate__string___gas_rate_for_eth__it_is_in_gwei__for_btcbchltc_it_is_gas_rate_per_vbyte of this InboundAddresses.  # noqa: E501
 
 
-        :return: The gas_rate__string___gas_rate_for_eth_it_is_in_gwei_for_btcbchltc_it_is_gas_rate_per_vbyte of this InboundAddresses.  # noqa: E501
+        :return: The gas_rate__string___gas_rate_for_eth__it_is_in_gwei__for_btcbchltc_it_is_gas_rate_per_vbyte of this InboundAddresses.  # noqa: E501
         :rtype: str
         """
-        return self._gas_rate__string___gas_rate_for_eth_it_is_in_gwei_for_btcbchltc_it_is_gas_rate_per_vbyte
+        return self._gas_rate__string___gas_rate_for_eth__it_is_in_gwei__for_btcbchltc_it_is_gas_rate_per_vbyte
 
-    @gas_rate__string___gas_rate_for_eth_it_is_in_gwei_for_btcbchltc_it_is_gas_rate_per_vbyte.setter
-    def gas_rate__string___gas_rate_for_eth_it_is_in_gwei_for_btcbchltc_it_is_gas_rate_per_vbyte(self, gas_rate__string___gas_rate_for_eth_it_is_in_gwei_for_btcbchltc_it_is_gas_rate_per_vbyte):
-        """Sets the gas_rate__string___gas_rate_for_eth_it_is_in_gwei_for_btcbchltc_it_is_gas_rate_per_vbyte of this InboundAddresses.
+    @gas_rate__string___gas_rate_for_eth__it_is_in_gwei__for_btcbchltc_it_is_gas_rate_per_vbyte.setter
+    def gas_rate__string___gas_rate_for_eth__it_is_in_gwei__for_btcbchltc_it_is_gas_rate_per_vbyte(self, gas_rate__string___gas_rate_for_eth__it_is_in_gwei__for_btcbchltc_it_is_gas_rate_per_vbyte):
+        """Sets the gas_rate__string___gas_rate_for_eth__it_is_in_gwei__for_btcbchltc_it_is_gas_rate_per_vbyte of this InboundAddresses.
 
 
-        :param gas_rate__string___gas_rate_for_eth_it_is_in_gwei_for_btcbchltc_it_is_gas_rate_per_vbyte: The gas_rate__string___gas_rate_for_eth_it_is_in_gwei_for_btcbchltc_it_is_gas_rate_per_vbyte of this InboundAddresses.  # noqa: E501
+        :param gas_rate__string___gas_rate_for_eth__it_is_in_gwei__for_btcbchltc_it_is_gas_rate_per_vbyte: The gas_rate__string___gas_rate_for_eth__it_is_in_gwei__for_btcbchltc_it_is_gas_rate_per_vbyte of this InboundAddresses.  # noqa: E501
         :type: str
         """
 
-        self._gas_rate__string___gas_rate_for_eth_it_is_in_gwei_for_btcbchltc_it_is_gas_rate_per_vbyte = gas_rate__string___gas_rate_for_eth_it_is_in_gwei_for_btcbchltc_it_is_gas_rate_per_vbyte
+        self._gas_rate__string___gas_rate_for_eth__it_is_in_gwei__for_btcbchltc_it_is_gas_rate_per_vbyte = gas_rate__string___gas_rate_for_eth__it_is_in_gwei__for_btcbchltc_it_is_gas_rate_per_vbyte
 
     def to_dict(self):
         """Returns the model properties as a dict"""

@@ -24,7 +24,6 @@ Method | HTTP request | Description
 [**get_proxied_queue**](DefaultApi.md#get_proxied_queue) | **GET** /v2/thorchain/queue | Proxied THORChain Queue
 [**get_stats**](DefaultApi.md#get_stats) | **GET** /v2/stats | Global Stats
 [**get_swap_history**](DefaultApi.md#get_swap_history) | **GET** /v2/history/swaps | Swaps History
-[**get_tvl_history**](DefaultApi.md#get_tvl_history) | **GET** /v2/history/tvl | Total Value Locked History
 
 # **get_actions**
 > InlineResponse200 get_actions(limit, offset, address=address, txid=txid, asset=asset, type=type)
@@ -980,60 +979,6 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**SwapHistory**](SwapHistory.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **get_tvl_history**
-> TVLHistory get_tvl_history(interval=interval, count=count, to=to, _from=_from)
-
-Total Value Locked History
-
-Returns total pool depths, total bonds, and total value locked in specified interval.  Total Value Locked = Total Bonds + 2 * Total Pool Depths  History endpoint has two modes: * With Interval parameter it returns a series of time buckets. From and To dates will   be rounded to the Interval boundaries. * Without Interval parameter a single From..To search is performed with exact timestamps.  * Interval: possible values: 5min, hour, day, week, month, quarter, year. * count: [1..400]. Defines number of intervals. Don't provide if Interval is missing. * from/to: optional int, unix second.  Possible usages with interval. * last 10 days: `?interval=day&count=10` * last 10 days before to: `?interval=day&count=10&to=1608825600` * next 10 days after from: `?interval=day&count=10&from=1606780800` * Days between from and to. From defaults to start of chain, to defaults to now.   Only the first 400 intervals are returned:   `interval=day&from=1606780800&to=1608825600`  Pagination is possible with from&count and then using the returned meta.endTime as the From parameter of the next query.  Possible configurations without interval: * exact search for one time frame: `?from=1606780899&to=1608825600` * one time frame until now: `?from=1606780899` * from chain start until now: no query parameters 
-
-### Example
-```python
-from __future__ import print_function
-import time
-import midgard_client
-from midgard_client.rest import ApiException
-from pprint import pprint
-
-# create an instance of the API class
-api_instance = midgard_client.DefaultApi()
-interval = 'interval_example' # str | Interval of calculations (optional)
-count = 56 # int | Number of intervals to return. Should be between [1..400]. (optional)
-to = 789 # int | End time of the query as unix timestamp. If only count is given, defaults to now. (optional)
-_from = 789 # int | Start time of the query as unix timestamp (optional)
-
-try:
-    # Total Value Locked History
-    api_response = api_instance.get_tvl_history(interval=interval, count=count, to=to, _from=_from)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling DefaultApi->get_tvl_history: %s\n" % e)
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **interval** | **str**| Interval of calculations | [optional] 
- **count** | **int**| Number of intervals to return. Should be between [1..400]. | [optional] 
- **to** | **int**| End time of the query as unix timestamp. If only count is given, defaults to now. | [optional] 
- **_from** | **int**| Start time of the query as unix timestamp | [optional] 
-
-### Return type
-
-[**TVLHistory**](TVLHistory.md)
 
 ### Authorization
 

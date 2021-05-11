@@ -32,14 +32,14 @@ class TestQueueApi(unittest.TestCase):
     def test_get_outbound_queue(self):
         """Test case for get_outbound_queue
 
-        Get outbound queue  # noqa: E501
+        get outbound queue  # noqa: E501
         """
         pass
 
     def test_get_outbound_queue_detail(self):
         """Test case for get_outbound_queue_detail
 
-        Get outbound queue detail  # noqa: E501
+        get outbound queue detail  # noqa: E501
         """
         pass
 

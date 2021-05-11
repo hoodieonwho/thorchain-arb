@@ -34,9 +34,9 @@ class LastBlockHeight(object):
     """
     swagger_types = {
         'chain': 'str',
-        'last_observed_in': 'float',
-        'last_sign_out': 'float',
-        'thorchain': 'float'
+        'last_observed_in': 'str',
+        'last_sign_out': 'str',
+        'thorchain': 'str'
     }
 
     attribute_map = {
@@ -97,7 +97,7 @@ class LastBlockHeight(object):
         last observed in block height  # noqa: E501
 
         :return: The last_observed_in of this LastBlockHeight.  # noqa: E501
-        :rtype: float
+        :rtype: str
         """
         return self._last_observed_in
 
@@ -108,7 +108,7 @@ class LastBlockHeight(object):
         last observed in block height  # noqa: E501
 
         :param last_observed_in: The last_observed_in of this LastBlockHeight.  # noqa: E501
-        :type: float
+        :type: str
         """
 
         self._last_observed_in = last_observed_in
@@ -120,7 +120,7 @@ class LastBlockHeight(object):
         last sign out block height  # noqa: E501
 
         :return: The last_sign_out of this LastBlockHeight.  # noqa: E501
-        :rtype: float
+        :rtype: str
         """
         return self._last_sign_out
 
@@ -131,7 +131,7 @@ class LastBlockHeight(object):
         last sign out block height  # noqa: E501
 
         :param last_sign_out: The last_sign_out of this LastBlockHeight.  # noqa: E501
-        :type: float
+        :type: str
         """
 
         self._last_sign_out = last_sign_out
@@ -143,7 +143,7 @@ class LastBlockHeight(object):
         current thorchain block height  # noqa: E501
 
         :return: The thorchain of this LastBlockHeight.  # noqa: E501
-        :rtype: float
+        :rtype: str
         """
         return self._thorchain
 
@@ -154,7 +154,7 @@ class LastBlockHeight(object):
         current thorchain block height  # noqa: E501
 
         :param thorchain: The thorchain of this LastBlockHeight.  # noqa: E501
-        :type: float
+        :type: str
         """
 
         self._thorchain = thorchain
