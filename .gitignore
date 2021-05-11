@@ -6,3 +6,4 @@ secret/
 .pytest_cache/
 tox.ini
 .travis.yml
+venv/
