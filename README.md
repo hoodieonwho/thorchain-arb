@@ -5,13 +5,12 @@ as a basis for people who want to develop arb bots.
 I will be making updates to this repo constantly.
 
 Donation:
-recently lost all my devices and some private key due to car robbery, would appreciate any donation:
-THORCHAIN:
-BNB: bnb1empnhqcjxc9uxjz2d0fz8vttszhyjjjufaalhv
-THOR: thor1uk7gnypj43z83m4uu94qn7vcwmj2estse0j2wk
-BTC: bc1q2qqmpyk4ffvuyxsmx5g0kf4n78djssml8c2z3c
-ETH: 0x953741e1864567cc7aa6b2b60528a955a550036e
-LTC: ltc1qvaqqzv059lhl22tdkgh40nrnj2tcuqzs92pf33
+recently lost all my devices and some private key due to car robbery, would appreciate any donation::
+- THOR: thor1uk7gnypj43z83m4uu94qn7vcwmj2estse0j2wk
+- BNB: bnb1empnhqcjxc9uxjz2d0fz8vttszhyjjjufaalhv
+- BTC: bc1q2qqmpyk4ffvuyxsmx5g0kf4n78djssml8c2z3c
+- ETH: 0x953741e1864567cc7aa6b2b60528a955a550036e
+- LTC: ltc1qvaqqzv059lhl22tdkgh40nrnj2tcuqzs92pf33
 
 
 # Installing Dependencies

@@ -35,6 +35,7 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
     # thor.oracle.print_market_price()
     found = 0
     watch_only = False
+    withdrawing = False
     while found == 0:
         time.sleep(0.5)
         for thor_asset in trading_asset:
@@ -63,14 +64,16 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
             thor_ins = range(400, 700, 100)
             if float(thor_ins[0]) > float(await thor.account.get_balance(unit_asset)):
                 arb_log.warning("not enough balance")
-                ftx_balance = await cex_oracle.get_balance()
+                ftx_balance = await cex_oracle.get_balance(symbol="USD")
                 cex_log.warning(f"your ftx balance: {ftx_balance}")
-                cex_log.info(f"withdrawing {unit_asset.symbol}from ftx")
-                # Withdraw from FTX
-                fa = '107469'
-                result = await cex_oracle.withdraw(asset=unit_asset.symbol, amount=6352, addr=thor.account.get_address(unit_asset))
+                if not withdrawing:
+                    cex_log.info(f"withdrawing {ftx_balance} {unit_asset.symbol} from ftx")
+                    # Withdraw from FTX
+                    result = await cex_oracle.withdraw(asset="BUSD", amount=ftx_balance, addr=thor.account.get_address(unit_asset))
+                    withdrawing = True
                 time.sleep(1)
             else:
+                withdrawing = False
                 for thor_in in thor_ins:
                     fast = True
                     while fast is True:
@@ -123,7 +126,7 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
 def main():
     # Declare your CEX Trader
     ftx = FTXTrader()
-    profile_1 = {'network': 'MCCN', 'unit_asset':'BNB.BUSD-BD1', 'trading_asset':['LTC.LTC', 'BCH.BCH'], 'cex_oracle': ftx, 'diff':4}
+    profile_1 = {'network': 'MCCN', 'unit_asset':'BNB.BUSD-BD1', 'trading_asset':['BCH.BCH'], 'cex_oracle': ftx, 'diff':4}
     thor_side = Process(target=thor_ops_handler(profile_1))
     thor_side.start()
 

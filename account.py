@@ -129,7 +129,8 @@ class Account:
                 account_log.info(f'BNB DEX asset: {balances[0].asset} amount:{balances[0].amount}')
                 return balances[0].amount
             else:
-                account_log.info("no balance")
+                account_log.info("BNB DEX: no balance")
+                return 0
 
     def get_address(self, asset):
         addr = ''
