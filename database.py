@@ -1,42 +1,54 @@
 from pymongo import MongoClient
 from datetime import datetime
-import os
 
 
 class DB:
-    def __init__(self):
-        self.client = MongoClient(open("secret/mongodb", 'r').read())
+    def __init__(self, cred):
+        self.client = MongoClient(cred)
         self.db = self.client.arb
+        self.thortrader = self.db.thortrader
+        self.ftxtrader = self.db.ftxtrader
 
-    def insert_balance_diff(self, tx):
-        result = self.db.balances.insert_one(balance_diff)
-
-    def insert_tx(self, tx):
-        result = self.db.txs.insert_one(tx)
-
-    def get_txs(self):
-        txs = self.db.txs.find()
-        return txs
-
-    def get_unaccounted_txs(self):
-        txs = self.db.txs.find({'status': None})
-        return txs
-
-    def add_profit_txs(self, id, usd_gain, rune_gain, status):
-        result = self.db.txs.update_one({'_id': id}, {'$set': {'usd_gain': usd_gain, 'rune_gain': rune_gain, 'status': status}}, upsert=True)
+    def post_action(self, action):
+        result = self.thortrader.insert_one(action)
         return result
 
-    def add_timestamp(self):
-        time = datetime.now()
-        with open('timestamp.txt', 'r+') as f:
-            lastime = f.readlines()
-            if lastime:
-                print(f'last time was {lastime}')
-            else:
-                print(f'last time was {time}')
-            f.write(str(time))
-        f.close()
+    def post_filtered_action(self, action, additional=None):
+        tx = {}
+        tx['tx_id'] = action['tx']['id']
+        tx['in_asset'] = action['tx']['coins'][0]['asset']
+        tx['in_amount'] = float(action['tx']['coins'][0]['amount'])
+        tx['gas_asset'] = action['tx']['gas'][0]['asset']
+        tx['gas_amount'] = float(action['tx']['gas'][0]['amount'])
+        tx["time"] = datetime.now()
+        if additional:
+            tx.update(additional)
+        result = self.ftxtrader.insert_one(tx)
+        return result
 
-    def get_failed_txs(self):
-        txs = self.db.txs.find({'status': {'$ne': 'success'}})
-        return txs
+    def get_action(self):
+        result = self.thortrader.find_one()
+        return result
+
+    def get_filtered_action(self, filter=None):
+        if filter:
+            result = self.ftxtrader.find_one(filter)
+        else:
+            result = self.ftxtrader.find_one()
+        return result
+
+    def delete_action(self, filter):
+        result = self.thortrader.delete_one(filter)
+        return result
+
+    def delete_filtered_action(self, filter):
+        result = self.ftxtrader.delete_one(filter)
+        return result
+
+    def delete_collection(self):
+        result = self.ftxtrader.drop()
+        return result
+
+    def update_collection(self, filter, update):
+        result = self.ftxtrader.update_one(filter=filter, update={"$set": update})
+        return result

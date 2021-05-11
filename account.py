@@ -10,7 +10,7 @@ account_log = get_logger("account", level=logging.DEBUG)
 
 
 MNEMONICFILE = "secret/real_mnemonic"
-NETWORK = 'mainnet' # ropsten for eth testnet
+NETWORK = 'mainnet'  # ropsten for eth testnet
 
 
 def init_eth():
