@@ -72,7 +72,7 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = thornode_client.TxApi()
-hash = '\"E17A0906E015F0C343691C18E475C8CB5F3F6C63F5BCDE0F3A341909763CC92B\"' # str | Tx hash of an inbound transaction or outbound transaction
+hash = 'E17A0906E015F0C343691C18E475C8CB5F3F6C63F5BCDE0F3A341909763CC92B' # str | Tx hash of an inbound transaction or outbound transaction
 
 try:
     # Get tx signers

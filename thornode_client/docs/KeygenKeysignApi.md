@@ -1,19 +1,19 @@
-# thornode_client.KeygenkeysignApi
+# thornode_client.KeygenKeysignApi
 
 All URIs are relative to *https://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**get_keygen**](KeygenkeysignApi.md#get_keygen) | **GET** /thorchain/keygen/{height}/{pubkey} | get keygen
-[**get_keysign**](KeygenkeysignApi.md#get_keysign) | **GET** /thorchain/keysign/{height}/{pubkey} | Get keysign
+[**get_keygen**](KeygenKeysignApi.md#get_keygen) | **GET** /thorchain/keygen/{height}/{pubkey} | Get Keygen
+[**get_keysign**](KeygenKeysignApi.md#get_keysign) | **GET** /thorchain/keysign/{height}/{pubkey} | Get Keysign
 
 
 # **get_keygen**
 > object get_keygen(height, pubkey)
 
-get keygen
+Get Keygen
 
-Retrieve keygen block  from THORChain
+Retrieve Keygen block from THORChain
 
 ### Example
 ```python
@@ -24,16 +24,16 @@ from thornode_client.rest import ApiException
 from pprint import pprint
 
 # create an instance of the API class
-api_instance = thornode_client.KeygenkeysignApi()
+api_instance = thornode_client.KeygenKeysignApi()
 height = '1024' # str | block height
-pubkey = '\"\"' # str | node public key
+pubkey = 'pubkey_example' # str | node public key
 
 try:
-    # get keygen
+    # Get Keygen
     api_response = api_instance.get_keygen(height, pubkey)
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling KeygenkeysignApi->get_keygen: %s\n" % e)
+    print("Exception when calling KeygenKeysignApi->get_keygen: %s\n" % e)
 ```
 
 ### Parameters
@@ -61,9 +61,9 @@ No authorization required
 # **get_keysign**
 > object get_keysign(height, pubkey)
 
-Get keysign
+Get Keysign
 
-Retrieve keysign information from THORChain
+Retrieve Keysign information from THORChain
 
 ### Example
 ```python
@@ -74,16 +74,16 @@ from thornode_client.rest import ApiException
 from pprint import pprint
 
 # create an instance of the API class
-api_instance = thornode_client.KeygenkeysignApi()
+api_instance = thornode_client.KeygenKeysignApi()
 height = '1024' # str | block height
-pubkey = '\"\"' # str | node public key
+pubkey = 'pubkey_example' # str | node public key
 
 try:
-    # Get keysign
+    # Get Keysign
     api_response = api_instance.get_keysign(height, pubkey)
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling KeygenkeysignApi->get_keysign: %s\n" % e)
+    print("Exception when calling KeygenKeysignApi->get_keysign: %s\n" % e)
 ```
 
 ### Parameters

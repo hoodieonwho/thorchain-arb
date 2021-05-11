@@ -1,0 +1,6 @@
+README.md
+setup.py
+thorchain_arb.egg-info/PKG-INFO
+thorchain_arb.egg-info/SOURCES.txt
+thorchain_arb.egg-info/dependency_links.txt
+thorchain_arb.egg-info/top_level.txt

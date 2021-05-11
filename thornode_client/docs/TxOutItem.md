@@ -1,4 +1,4 @@
-# Txoutitem
+# TxOutItem
 
 ## Properties
 Name | Type | Description | Notes

@@ -16,15 +16,15 @@ from __future__ import absolute_import
 import unittest
 
 import thornode_client
-from thornode_client.api.keygenkeysign_api import KeygenkeysignApi  # noqa: E501
+from thornode_client.api.keygen__keysign_api import KeygenKeysignApi  # noqa: E501
 from thornode_client.rest import ApiException
 
 
-class TestKeygenkeysignApi(unittest.TestCase):
-    """KeygenkeysignApi unit test stubs"""
+class TestKeygenKeysignApi(unittest.TestCase):
+    """KeygenKeysignApi unit test stubs"""
 
     def setUp(self):
-        self.api = thornode_client.api.keygenkeysign_api.KeygenkeysignApi()  # noqa: E501
+        self.api = thornode_client.api.keygen__keysign_api.KeygenKeysignApi()  # noqa: E501
 
     def tearDown(self):
         pass
@@ -32,14 +32,14 @@ class TestKeygenkeysignApi(unittest.TestCase):
     def test_get_keygen(self):
         """Test case for get_keygen
 
-        get keygen  # noqa: E501
+        Get Keygen  # noqa: E501
         """
         pass
 
     def test_get_keysign(self):
         """Test case for get_keysign
 
-        Get keysign  # noqa: E501
+        Get Keysign  # noqa: E501
         """
         pass
 

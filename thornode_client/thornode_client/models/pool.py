@@ -37,7 +37,10 @@ class Pool(object):
         'balance_asset': 'str',
         'asset': 'str',
         'pool_units': 'str',
-        'status': 'str'
+        'status': 'str',
+        'synth_units': 'str',
+        'pending_inbound_rune': 'str',
+        'pending_inbound_asset': 'str'
     }
 
     attribute_map = {
@@ -45,10 +48,13 @@ class Pool(object):
         'balance_asset': 'balance_asset',
         'asset': 'asset',
         'pool_units': 'pool_units',
-        'status': 'status'
+        'status': 'status',
+        'synth_units': 'synth_units',
+        'pending_inbound_rune': 'pending_inbound_rune',
+        'pending_inbound_asset': 'pending_inbound_asset'
     }
 
-    def __init__(self, balance_rune=None, balance_asset=None, asset=None, pool_units=None, status=None, _configuration=None):  # noqa: E501
+    def __init__(self, balance_rune=None, balance_asset=None, asset=None, pool_units=None, status=None, synth_units=None, pending_inbound_rune=None, pending_inbound_asset=None, _configuration=None):  # noqa: E501
         """Pool - a model defined in Swagger"""  # noqa: E501
         if _configuration is None:
             _configuration = Configuration()
@@ -59,6 +65,9 @@ class Pool(object):
         self._asset = None
         self._pool_units = None
         self._status = None
+        self._synth_units = None
+        self._pending_inbound_rune = None
+        self._pending_inbound_asset = None
         self.discriminator = None
 
         if balance_rune is not None:
@@ -71,12 +80,18 @@ class Pool(object):
             self.pool_units = pool_units
         if status is not None:
             self.status = status
+        if synth_units is not None:
+            self.synth_units = synth_units
+        if pending_inbound_rune is not None:
+            self.pending_inbound_rune = pending_inbound_rune
+        if pending_inbound_asset is not None:
+            self.pending_inbound_asset = pending_inbound_asset
 
     @property
     def balance_rune(self):
         """Gets the balance_rune of this Pool.  # noqa: E501
 
-        Amount of rune the pool has  # noqa: E501
+        amount of rune the pool has  # noqa: E501
 
         :return: The balance_rune of this Pool.  # noqa: E501
         :rtype: str
@@ -87,7 +102,7 @@ class Pool(object):
     def balance_rune(self, balance_rune):
         """Sets the balance_rune of this Pool.
 
-        Amount of rune the pool has  # noqa: E501
+        amount of rune the pool has  # noqa: E501
 
         :param balance_rune: The balance_rune of this Pool.  # noqa: E501
         :type: str
@@ -99,7 +114,7 @@ class Pool(object):
     def balance_asset(self):
         """Gets the balance_asset of this Pool.  # noqa: E501
 
-        Amount of asset the pool has  # noqa: E501
+        amount of asset the pool has  # noqa: E501
 
         :return: The balance_asset of this Pool.  # noqa: E501
         :rtype: str
@@ -110,7 +125,7 @@ class Pool(object):
     def balance_asset(self, balance_asset):
         """Sets the balance_asset of this Pool.
 
-        Amount of asset the pool has  # noqa: E501
+        amount of asset the pool has  # noqa: E501
 
         :param balance_asset: The balance_asset of this Pool.  # noqa: E501
         :type: str
@@ -122,7 +137,7 @@ class Pool(object):
     def asset(self):
         """Gets the asset of this Pool.  # noqa: E501
 
-        the asset of the non-rune asset  # noqa: E501
+        pool asset  # noqa: E501
 
         :return: The asset of this Pool.  # noqa: E501
         :rtype: str
@@ -133,7 +148,7 @@ class Pool(object):
     def asset(self, asset):
         """Sets the asset of this Pool.
 
-        the asset of the non-rune asset  # noqa: E501
+        pool asset  # noqa: E501
 
         :param asset: The asset of this Pool.  # noqa: E501
         :type: str
@@ -168,7 +183,7 @@ class Pool(object):
     def status(self):
         """Gets the status of this Pool.  # noqa: E501
 
-        the status of the pool  # noqa: E501
+        status of the pool  # noqa: E501
 
         :return: The status of this Pool.  # noqa: E501
         :rtype: str
@@ -179,13 +194,82 @@ class Pool(object):
     def status(self, status):
         """Sets the status of this Pool.
 
-        the status of the pool  # noqa: E501
+        status of the pool  # noqa: E501
 
         :param status: The status of this Pool.  # noqa: E501
         :type: str
         """
 
         self._status = status
+
+    @property
+    def synth_units(self):
+        """Gets the synth_units of this Pool.  # noqa: E501
+
+        total number of synth units within the pool  # noqa: E501
+
+        :return: The synth_units of this Pool.  # noqa: E501
+        :rtype: str
+        """
+        return self._synth_units
+
+    @synth_units.setter
+    def synth_units(self, synth_units):
+        """Sets the synth_units of this Pool.
+
+        total number of synth units within the pool  # noqa: E501
+
+        :param synth_units: The synth_units of this Pool.  # noqa: E501
+        :type: str
+        """
+
+        self._synth_units = synth_units
+
+    @property
+    def pending_inbound_rune(self):
+        """Gets the pending_inbound_rune of this Pool.  # noqa: E501
+
+        amount of pending rune within the pool  # noqa: E501
+
+        :return: The pending_inbound_rune of this Pool.  # noqa: E501
+        :rtype: str
+        """
+        return self._pending_inbound_rune
+
+    @pending_inbound_rune.setter
+    def pending_inbound_rune(self, pending_inbound_rune):
+        """Sets the pending_inbound_rune of this Pool.
+
+        amount of pending rune within the pool  # noqa: E501
+
+        :param pending_inbound_rune: The pending_inbound_rune of this Pool.  # noqa: E501
+        :type: str
+        """
+
+        self._pending_inbound_rune = pending_inbound_rune
+
+    @property
+    def pending_inbound_asset(self):
+        """Gets the pending_inbound_asset of this Pool.  # noqa: E501
+
+        amount of pending asset within the pool  # noqa: E501
+
+        :return: The pending_inbound_asset of this Pool.  # noqa: E501
+        :rtype: str
+        """
+        return self._pending_inbound_asset
+
+    @pending_inbound_asset.setter
+    def pending_inbound_asset(self, pending_inbound_asset):
+        """Sets the pending_inbound_asset of this Pool.
+
+        amount of pending asset within the pool  # noqa: E501
+
+        :param pending_inbound_asset: The pending_inbound_asset of this Pool.  # noqa: E501
+        :type: str
+        """
+
+        self._pending_inbound_asset = pending_inbound_asset
 
     def to_dict(self):
         """Returns the model properties as a dict"""

@@ -25,7 +25,7 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = thornode_client.NodesApi()
-node_address = '\"tthor1f3s7q037eancht7sg0aj995dht25rwrnu4ats5\"' # str | node address
+node_address = 'thor1f3s7q037eancht7sg0aj995dht25rwrnu4ats5' # str | node address
 
 try:
     # Get a node

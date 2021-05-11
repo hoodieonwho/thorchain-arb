@@ -45,11 +45,14 @@
                         "headers": {},
                         "examples": {
                             "application/json": {
-                                "balance_rune": "",
-                                "balance_asset": "",
-                                "asset": "",
-                                "pool_units": "",
-                                "status": ""
+                                "balance_rune": "13460619152985",
+                                "balance_asset": "3197744873",
+                                "asset": "BTC.BTC",
+                                "pool_units": "14694928607473",
+                                "status": "Available",
+                                "synth_units": "0",
+                                "pending_inbound_rune": "464993836",
+                                "pending_inbound_asset": "101713319"
                             }
                         },
                         "schema": {
@@ -57,15 +60,15 @@
                             "properties": {
                                 "balance_rune": {
                                     "type": "string",
-                                    "description": "Amount of rune the pool has"
+                                    "description": "amount of rune the pool has"
                                 },
                                 "balance_asset": {
                                     "type": "string",
-                                    "description": "Amount of asset the pool has"
+                                    "description": "amount of asset the pool has"
                                 },
                                 "asset": {
                                     "type": "string",
-                                    "description": "the asset of the non-rune asset"
+                                    "description": "pool asset"
                                 },
                                 "pool_units": {
                                     "type": "string",
@@ -73,7 +76,19 @@
                                 },
                                 "status": {
                                     "type": "string",
-                                    "description": "the status of the pool"
+                                    "description": "status of the pool"
+                                },
+                                "synth_units": {
+                                    "type": "string",
+                                    "description": "total number of synth units within the pool"
+                                },
+                                "pending_inbound_rune": {
+                                    "type": "string",
+                                    "description": "amount of pending rune within the pool"
+                                },
+                                "pending_inbound_asset": {
+                                    "type": "string",
+                                    "description": "amount of pending asset within the pool"
                                 }
                             }
                         }
@@ -109,11 +124,74 @@
                         "examples": {
                             "application/json": [
                                 {
-                                    "balance_rune": "",
-                                    "balance_asset": "",
-                                    "asset": "",
-                                    "pool_units": "",
-                                    "status": ""
+                                    "balance_rune": "990304018943",
+                                    "balance_asset": "14902274220",
+                                    "asset": "BCH.BCH",
+                                    "pool_units": "944477442283",
+                                    "status": "Available",
+                                    "synth_units": "0",
+                                    "pending_inbound_rune": "0",
+                                    "pending_inbound_asset": "257058484"
+                                },
+                                {
+                                    "balance_rune": "5227668587847",
+                                    "balance_asset": "117072844569",
+                                    "asset": "BNB.BNB",
+                                    "pool_units": "4919785756191",
+                                    "status": "Available",
+                                    "synth_units": "0",
+                                    "pending_inbound_rune": "0",
+                                    "pending_inbound_asset": "1589030575"
+                                },
+                                {
+                                    "balance_rune": "2906260051490",
+                                    "balance_asset": "643467346",
+                                    "asset": "BNB.BTCB-1DE",
+                                    "pool_units": "2816600000000",
+                                    "status": "Available",
+                                    "synth_units": "0",
+                                    "pending_inbound_rune": "0",
+                                    "pending_inbound_asset": "230000"
+                                },
+                                {
+                                    "balance_rune": "2414614240711",
+                                    "balance_asset": "26650266002988",
+                                    "asset": "BNB.BUSD-BD1",
+                                    "pool_units": "2348364113912",
+                                    "status": "Available",
+                                    "synth_units": "0",
+                                    "pending_inbound_rune": "0",
+                                    "pending_inbound_asset": "82718240853"
+                                },
+                                {
+                                    "balance_rune": "9019619987525",
+                                    "balance_asset": "45893334588",
+                                    "asset": "ETH.ETH",
+                                    "pool_units": "8549256862314",
+                                    "status": "Available",
+                                    "synth_units": "0",
+                                    "pending_inbound_rune": "14500000000",
+                                    "pending_inbound_asset": "64193305"
+                                },
+                                {
+                                    "balance_rune": "90000000000",
+                                    "balance_asset": "33000000000",
+                                    "asset": "ETH.LINK-0X514910771AF9CA656AF840DFF83E8264ECF986CA",
+                                    "pool_units": "101000000000",
+                                    "status": "Staged",
+                                    "synth_units": "0",
+                                    "pending_inbound_rune": "0",
+                                    "pending_inbound_asset": "0"
+                                },
+                                {
+                                    "balance_rune": "1028041431770",
+                                    "balance_asset": "52175862117",
+                                    "asset": "LTC.LTC",
+                                    "pool_units": "1076474234756",
+                                    "status": "Available",
+                                    "synth_units": "0",
+                                    "pending_inbound_rune": "6313867419",
+                                    "pending_inbound_asset": "3910921839"
                                 }
                             ]
                         },
@@ -130,6 +208,98 @@
                     "Pools"
                 ],
                 "parameters": [],
+                "produces": [
+                    "application/json"
+                ]
+            }
+        },
+        "/thorchain/pool/{asset}/liquidity_provider/{address}": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {},
+                        "examples": {
+                            "application/json": {
+                                "asset": "BNB.BNB",
+                                "rune_address": "thor1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                                "asset_address": "bnb1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                                "last_add_height": 82745,
+                                "units": "0",
+                                "pending_rune": "0",
+                                "pending_asset": "242000000",
+                                "pending_tx_Id": "C4C876802xxxxxxxxxxBC408829878446A37011EBBA0C5CAA3DD64A548879CB228",
+                                "rune_deposit_value": "0",
+                                "asset_deposit_value": "0"
+                            }
+                        },
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "asset": {
+                                    "type": "string",
+                                    "description": "the asset of the non-rune asset"
+                                },
+                                "rune_address": {
+                                    "type": "string",
+                                    "description": "the rune address of the liquidity provider"
+                                },
+                                "asset_address": {
+                                    "type": "string",
+                                    "description": "the non-rune asset address of the liquidity provider"
+                                },
+                                "last_add": {
+                                    "type": "string",
+                                    "description": "block height of the last add"
+                                },
+                                "last_withdraw": {
+                                    "type": "string",
+                                    "description": "block height of the last withdraw"
+                                },
+                                "units": {
+                                    "type": "string",
+                                    "description": "the total number of units of the pool"
+                                },
+                                "pending_rune": {
+                                    "type": "string",
+                                    "description": "rune that has been provided, but not committed yet. Awaiting a provision of the non-rune asset"
+                                },
+                                "pending_asset": {
+                                    "type": "string",
+                                    "description": "asset"
+                                },
+                                "pending_tx_id": {
+                                    "type": "string",
+                                    "description": "pending tx id"
+                                }
+                            }
+                        }
+                    }
+                },
+                "summary": "Get a liquidity provider of a pool",
+                "operationId": "Get a liquidity provider of a pool",
+                "description": "",
+                "tags": [
+                    "Pools"
+                ],
+                "parameters": [
+                    {
+                        "name": "asset",
+                        "in": "path",
+                        "description": "The asset of the pool",
+                        "required": true,
+                        "x-example": "BNB.BNB",
+                        "type": "string"
+                    },
+                    {
+                        "name": "address",
+                        "in": "path",
+                        "description": "The address of the liquidity provider",
+                        "required": true,
+                        "x-example": "thorxxxxxxxxxxxxxxxxxxxxxxx",
+                        "type": "string"
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ]
@@ -174,7 +344,7 @@
                         "in": "path",
                         "description": "The asset of the pool",
                         "required": true,
-                        "x-example": "\"BNB.BNB\"",
+                        "x-example": "BNB.BNB",
                         "type": "string"
                     }
                 ],
@@ -328,7 +498,7 @@
                         "in": "path",
                         "description": "Tx hash of an inbound transaction or outbound transaction",
                         "required": true,
-                        "x-example": "\"E17A0906E015F0C343691C18E475C8CB5F3F6C63F5BCDE0F3A341909763CC92B\"",
+                        "x-example": "E17A0906E015F0C343691C18E475C8CB5F3F6C63F5BCDE0F3A341909763CC92B",
                         "type": "string"
                     }
                 ],
@@ -509,7 +679,7 @@
                 "operationId": "Get a node",
                 "description": "Retrieve the node with given node address from THORChain",
                 "tags": [
-                    "nodes"
+                    "Nodes"
                 ],
                 "parameters": [
                     {
@@ -517,7 +687,7 @@
                         "in": "path",
                         "description": "node address",
                         "required": true,
-                        "x-example": "\"tthor1f3s7q037eancht7sg0aj995dht25rwrnu4ats5\"",
+                        "x-example": "thor1f3s7q037eancht7sg0aj995dht25rwrnu4ats5",
                         "type": "string"
                     }
                 ],
@@ -577,7 +747,123 @@
                 "operationId": "Get all nodes",
                 "description": "Retrieve all nodes that have bond",
                 "tags": [
-                    "nodes"
+                    "Nodes"
+                ],
+                "parameters": [],
+                "produces": [
+                    "application/json"
+                ]
+            }
+        },
+        "/thorchain/vaults/asgard": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {},
+                        "examples": {
+                            "application/json": [
+                                {
+                                    "block_height": 30,
+                                    "pub_key": "tthorpub1addwnpepqfha5sms6cyxgmr9y6j3lg5pxzyc3x9g4hkanlwu2j5jgkva4ncaurn5zmd",
+                                    "coins": [
+                                        {
+                                            "asset": "BNB.RUNE-67C",
+                                            "amount": "3000000000000000"
+                                        },
+                                        {
+                                            "asset": "BNB.BNB",
+                                            "amount": "100000000000"
+                                        },
+                                        {
+                                            "asset": "BNB.LOK-3C0",
+                                            "amount": "40000000000"
+                                        },
+                                        {
+                                            "asset": "BNB.BTCB-101",
+                                            "amount": "40000000000"
+                                        },
+                                        {
+                                            "asset": "BTC.BTC",
+                                            "amount": "100000000"
+                                        },
+                                        {
+                                            "asset": "LTC.LTC",
+                                            "amount": "500000000"
+                                        },
+                                        {
+                                            "asset": "BCH.BCH",
+                                            "amount": "500000000"
+                                        },
+                                        {
+                                            "asset": "ETH.TKN-0X3B7FA4DD21C6F9BA3CA375217EAD7CAB9D6BF483",
+                                            "amount": "500000000"
+                                        },
+                                        {
+                                            "asset": "ETH.ETH",
+                                            "amount": "1000000000"
+                                        }
+                                    ],
+                                    "type": "AsgardVault",
+                                    "status": "ActiveVault",
+                                    "membership": [
+                                        "tthorpub1addwnpepqfha5sms6cyxgmr9y6j3lg5pxzyc3x9g4hkanlwu2j5jgkva4ncaurn5zmd"
+                                    ],
+                                    "chains": [
+                                        "THOR",
+                                        "BTC",
+                                        "LTC",
+                                        "BCH",
+                                        "BNB",
+                                        "ETH"
+                                    ],
+                                    "inbound_tx_count": 11,
+                                    "routers": [
+                                        {
+                                            "chain": "ETH",
+                                            "router": "0xE65e9d372F8cAcc7b6dfcd4af6507851Ed31bb44"
+                                        }
+                                    ],
+                                    "addresses": [
+                                        {
+                                            "chain": "THOR",
+                                            "address": "tthor1syneecwgwvn6zkv47k3cq65fuzrp24yzxyk279"
+                                        },
+                                        {
+                                            "chain": "BTC",
+                                            "address": "bcrt1qsyneecwgwvn6zkv47k3cq65fuzrp24yz6pz56g"
+                                        },
+                                        {
+                                            "chain": "LTC",
+                                            "address": "rltc1qsyneecwgwvn6zkv47k3cq65fuzrp24yzyvcadk"
+                                        },
+                                        {
+                                            "chain": "BCH",
+                                            "address": "qzqj088pepej0g2ejh668qr238sgv925sg4g5hp57p"
+                                        },
+                                        {
+                                            "chain": "BNB",
+                                            "address": "tbnb1syneecwgwvn6zkv47k3cq65fuzrp24yzg9gfnq"
+                                        },
+                                        {
+                                            "chain": "ETH",
+                                            "address": "0x61666aa597b4344f855d25b92385b5eb0c650074"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        "schema": {
+                            "type": "array",
+                            "items": {}
+                        }
+                    }
+                },
+                "summary": "Get Asgard vaults",
+                "operationId": "Get Asgard vaults",
+                "description": "Retrieve all current active Asgard vaults from thorchain",
+                "tags": [
+                    "Vaults"
                 ],
                 "parameters": [],
                 "produces": [
@@ -674,11 +960,11 @@
                         }
                     }
                 },
-                "summary": "get all yggdrasil vaults",
-                "operationId": "get all yggdrasil vaults",
-                "description": "Retrieve all yggdrasil vaults from THORChain",
+                "summary": "Get Yggdrasil vaults",
+                "operationId": "Get Yggdrasil vaults",
+                "description": "Retrieve all Yggdrasil vaults from THORChain",
                 "tags": [
-                    "vaults"
+                    "Vaults"
                 ],
                 "parameters": [],
                 "produces": [
@@ -847,11 +1133,11 @@
                         }
                     }
                 },
-                "summary": "get a vault by pubkey",
-                "operationId": "get a vault by pubkey",
+                "summary": "Get a vault by pubkey",
+                "operationId": "Get a vault by pubkey",
                 "description": "",
                 "tags": [
-                    "vaults"
+                    "Vaults"
                 ],
                 "parameters": [
                     {
@@ -859,7 +1145,6 @@
                         "in": "path",
                         "description": "pubkey of the vault",
                         "required": true,
-                        "x-example": "\"\"",
                         "type": "string"
                     }
                 ],
@@ -887,23 +1172,23 @@
                             "properties": {
                                 "asgard": {
                                     "type": "array",
-                                    "description": "all asgard vaults public key",
+                                    "description": "all Asgard vaults public key",
                                     "items": {}
                                 },
                                 "yggdrasil": {
                                     "type": "array",
-                                    "description": "all yggdrasil vaults publikc keys",
+                                    "description": "all Yggdrasil vaults publikc keys",
                                     "items": {}
                                 }
                             }
                         }
                     }
                 },
-                "summary": "get vault pubkeys",
-                "operationId": "get vault pubkeys",
-                "description": "Retrieve all vaults' public keys",
+                "summary": "Get vault pubkeys",
+                "operationId": "Get vault pubkeys",
+                "description": "Retrieve all vaults public keys",
                 "tags": [
-                    "vaults"
+                    "Vaults"
                 ],
                 "parameters": [],
                 "produces": [
@@ -918,10 +1203,10 @@
                         "description": "OK",
                         "headers": {},
                         "examples": {
-                            "applicaton/json": "{\n    \"bond_reward_rune\": \"857134475040\",\n    \"total_bond_units\": \"0\",\n    \"total_reserve\": \"21999180112172346\"\n}\n"
+                            "applicaton/json": "{\n    \"bond_reward_rune\": \"857134475040\",\n    \"total_bond_units\": \"0\",\n    \"total_reserve\": \"21999180112172346\",\n    \"burned_bep_2_rune\": \"674699077345087\",\n    \"burned_erc_20_rune\": \"66369401654835\"\n}\n"
                         },
                         "schema": {
-                            "$ref": "#/definitions/network"
+                            "$ref": "#/definitions/Network"
                         }
                     }
                 },
@@ -929,7 +1214,7 @@
                 "operationId": "Get network data",
                 "description": "Retrieve network data from THORChain",
                 "tags": [
-                    "network"
+                    "Network"
                 ],
                 "parameters": [],
                 "produces": [
@@ -943,7 +1228,42 @@
                     "200": {
                         "description": "OK",
                         "headers": {},
-                        "examples": {},
+                        "examples": {
+                            "application/json": [
+                                {
+                                    "chain": "BCH",
+                                    "pub_key": "thorpub1addwnpepq2jqhv5rdqlkusfxy05stfzcgslhhz5qh8pxetw5ry2aa6awgdh3shq8s82",
+                                    "address": "qzvhxqm3clrhewqllfmt2ekuaa7puhwpns3kl5nj7a",
+                                    "gas_rate": "6"
+                                },
+                                {
+                                    "chain": "BNB",
+                                    "pub_key": "thorpub1addwnpepq2jqhv5rdqlkusfxy05stfzcgslhhz5qh8pxetw5ry2aa6awgdh3shq8s82",
+                                    "address": "bnb1n9esxuw8ca7ts8l6w66kdh800s09msvul6vlse",
+                                    "halted": true,
+                                    "gas_rate": "11250"
+                                },
+                                {
+                                    "chain": "BTC",
+                                    "pub_key": "thorpub1addwnpepq2jqhv5rdqlkusfxy05stfzcgslhhz5qh8pxetw5ry2aa6awgdh3shq8s82",
+                                    "address": "bc1qn9esxuw8ca7ts8l6w66kdh800s09msvutydc46",
+                                    "gas_rate": "214"
+                                },
+                                {
+                                    "chain": "ETH",
+                                    "pub_key": "thorpub1addwnpepq2jqhv5rdqlkusfxy05stfzcgslhhz5qh8pxetw5ry2aa6awgdh3shq8s82",
+                                    "address": "0x1091c4de6a3cf09cda00abdaed42c7c3b69c83ec",
+                                    "router": "0x42A5Ed456650a09Dc10EBc6361A7480fDd61f27B",
+                                    "gas_rate": "40"
+                                },
+                                {
+                                    "chain": "LTC",
+                                    "pub_key": "thorpub1addwnpepq2jqhv5rdqlkusfxy05stfzcgslhhz5qh8pxetw5ry2aa6awgdh3shq8s82",
+                                    "address": "ltc1qn9esxuw8ca7ts8l6w66kdh800s09msvu0chud2",
+                                    "gas_rate": "147"
+                                }
+                            ]
+                        },
                         "schema": {
                             "type": "array",
                             "items": {}
@@ -954,9 +1274,12 @@
                 "operationId": "Get inbound addresses",
                 "description": "Retrieve all the inbound addresses from THORChain",
                 "tags": [
-                    "network"
+                    "Network"
                 ],
-                "parameters": []
+                "parameters": [],
+                "produces": [
+                    "application/json"
+                ]
             }
         },
         "/thorchain/lastblock/{chain}": {
@@ -969,9 +1292,9 @@
                             "application/json": [
                                 {
                                     "chain": "BNB",
-                                    "last_observed_in": "1590",
-                                    "last_signed_out": "109",
-                                    "thorchain": "1548"
+                                    "last_observed_in": 159097122,
+                                    "last_signed_out": 233726,
+                                    "thorchain": 233735
                                 }
                             ]
                         },
@@ -985,7 +1308,7 @@
                 "operationId": "Get last block height per chain",
                 "description": "Retrieve the last block height information about the request chain",
                 "tags": [
-                    "network"
+                    "Network"
                 ],
                 "parameters": [
                     {
@@ -993,10 +1316,68 @@
                         "in": "path",
                         "description": "chain",
                         "required": true,
-                        "x-example": "\"BNB\"",
+                        "x-example": "BNB",
                         "type": "string"
                     }
                 ],
+                "produces": [
+                    "application/json"
+                ]
+            }
+        },
+        "/thorchain/lastblock": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {},
+                        "examples": {
+                            "application/json": [
+                                {
+                                    "chain": "BCH",
+                                    "last_observed_in": 684829,
+                                    "last_signed_out": 233674,
+                                    "thorchain": 233727
+                                },
+                                {
+                                    "chain": "BNB",
+                                    "last_observed_in": 159097122,
+                                    "last_signed_out": 233674,
+                                    "thorchain": 233727
+                                },
+                                {
+                                    "chain": "BTC",
+                                    "last_observed_in": 680532,
+                                    "last_signed_out": 233674,
+                                    "thorchain": 233727
+                                },
+                                {
+                                    "chain": "ETH",
+                                    "last_observed_in": 12308554,
+                                    "last_signed_out": 233674,
+                                    "thorchain": 233727
+                                },
+                                {
+                                    "chain": "LTC",
+                                    "last_observed_in": 2040853,
+                                    "last_signed_out": 233674,
+                                    "thorchain": 233727
+                                }
+                            ]
+                        },
+                        "schema": {
+                            "type": "array",
+                            "items": {}
+                        }
+                    }
+                },
+                "summary": "Get all last block height",
+                "operationId": "Get all last block height",
+                "description": "Retrieve lastest block infomation across all chains",
+                "tags": [
+                    "Network"
+                ],
+                "parameters": [],
                 "produces": [
                     "application/json"
                 ]
@@ -1033,7 +1414,7 @@
                 "operationId": "Get current network version",
                 "description": "Retrieve current network version from THORChain",
                 "tags": [
-                    "network"
+                    "Network"
                 ],
                 "parameters": [],
                 "produces": [
@@ -1050,39 +1431,49 @@
                         "examples": {
                             "application/json": {
                                 "int_64_values": {
-                                    "AsgardSize": 30,
-                                    "BadValidatorRate": 60,
-                                    "BlocksPerYear": 6311390,
-                                    "ChurnInterval": 60,
-                                    "ChurnRetryInterval": 30,
-                                    "CliTxCost": 0,
-                                    "DesiredValidatorSet": 12,
+                                    "AsgardSize": 40,
+                                    "BadValidatorRate": 43200,
+                                    "BadValidatorRedline": 3,
+                                    "BlocksPerYear": 5256000,
+                                    "ChurnInterval": 43200,
+                                    "ChurnRetryInterval": 720,
+                                    "DesiredValidatorSet": 100,
                                     "DoubleSignMaxAge": 24,
                                     "EmissionCurve": 6,
                                     "FailKeygenSlashPoints": 720,
                                     "FailKeysignSlashPoints": 2,
-                                    "FundMigrationInterval": 60,
-                                    "JailTimeKeygen": 10,
-                                    "JailTimeKeysign": 10,
+                                    "FullImpLossProtectionBlocks": 1440000,
+                                    "FundMigrationInterval": 360,
+                                    "IncentiveCurve": 100,
+                                    "JailTimeKeygen": 4320,
+                                    "JailTimeKeysign": 60,
                                     "LackOfObservationPenalty": 2,
                                     "LiquidityLockUpBlocks": 0,
-                                    "MinimumBondInRune": 100000000,
+                                    "MaxAvailablePools": 100,
+                                    "MaxSwapsPerBlock": 100,
+                                    "MinRunePoolDepth": 1000000000000,
+                                    "MinSlashPointsForBadValidator": 100,
+                                    "MinSwapsPerBlock": 10,
+                                    "MinimumBondInRune": 100000000000000,
                                     "MinimumNodesForBFT": 4,
                                     "MinimumNodesForYggdrasil": 6,
-                                    "NativeChainGasFee": 10000000,
-                                    "NewPoolCycle": 51840,
-                                    "ObservationDelayFlexibility": 5,
+                                    "NativeTransactionFee": 2000000,
+                                    "ObservationDelayFlexibility": 10,
                                     "ObserveSlashPoints": 1,
-                                    "OldValidatorRate": 60,
-                                    "OutboundTransactionFee": 100000000,
+                                    "OldValidatorRate": 43200,
+                                    "OutboundTransactionFee": 2000000,
+                                    "PoolCycle": 43200,
                                     "SigningTransactionPeriod": 300,
-                                    "YggFundLimit": 50
+                                    "StagedPoolCost": 1000000000,
+                                    "VirtualMultSynths": 2,
+                                    "YggFundLimit": 50,
+                                    "YggFundRetry": 1000
                                 },
                                 "bool_values": {
-                                    "StrictBondLiquidityRatio": false
+                                    "StrictBondLiquidityRatio": true
                                 },
                                 "string_values": {
-                                    "DefaultPoolStatus": "Enabled"
+                                    "DefaultPoolStatus": "Staged"
                                 }
                             }
                         }
@@ -1092,7 +1483,7 @@
                 "operationId": "Get constant values from THORChain",
                 "description": "Retrieve constant values from THORChain",
                 "tags": [
-                    "network"
+                    "Network"
                 ],
                 "parameters": [],
                 "produces": [
@@ -1114,11 +1505,11 @@
                         }
                     }
                 },
-                "summary": "Get ragnarok status",
-                "operationId": "Get ragnarok status",
+                "summary": "Get Ragnarok status",
+                "operationId": "Get Ragnarok status",
                 "description": "",
                 "tags": [
-                    "network"
+                    "Network"
                 ],
                 "parameters": [],
                 "produces": [
@@ -1158,11 +1549,11 @@
                         }
                     }
                 },
-                "summary": "get outbound queue",
-                "operationId": "get outbound queue",
+                "summary": "Get outbound queue",
+                "operationId": "Get outbound queue",
                 "description": "Retrieve the outbound queue information from THORChain",
                 "tags": [
-                    "queue"
+                    "Queue"
                 ],
                 "parameters": [],
                 "produces": [
@@ -1204,11 +1595,11 @@
                         }
                     }
                 },
-                "summary": "get outbound queue detail",
-                "operationId": "get outbound queue detail",
-                "description": "get the list of tx out item in the queue",
+                "summary": "Get outbound queue detail",
+                "operationId": "Get outbound queue detail",
+                "description": "Get the list of tx out items in the queue",
                 "tags": [
-                    "queue"
+                    "Queue"
                 ],
                 "parameters": [],
                 "produces": [
@@ -1256,11 +1647,11 @@
                         }
                     }
                 },
-                "summary": "get keygen",
-                "operationId": "get keygen",
-                "description": "Retrieve keygen block  from THORChain",
+                "summary": "Get Keygen",
+                "operationId": "Get Keygen",
+                "description": "Retrieve Keygen block from THORChain",
                 "tags": [
-                    "keygen/keysign"
+                    "Keygen / Keysign"
                 ],
                 "parameters": [
                     {
@@ -1276,7 +1667,6 @@
                         "in": "path",
                         "description": "node public key",
                         "required": true,
-                        "x-example": "\"\"",
                         "type": "string"
                     }
                 ],
@@ -1345,11 +1735,11 @@
                         }
                     }
                 },
-                "summary": "Get keysign",
-                "operationId": "Get keysign",
-                "description": "Retrieve keysign information from THORChain",
+                "summary": "Get Keysign",
+                "operationId": "Get Keysign",
+                "description": "Retrieve Keysign information from THORChain",
                 "tags": [
-                    "keygen/keysign"
+                    "Keygen / Keysign"
                 ],
                 "parameters": [
                     {
@@ -1365,7 +1755,6 @@
                         "in": "path",
                         "description": "node public key",
                         "required": true,
-                        "x-example": "\"\"",
                         "type": "string"
                     }
                 ],
@@ -1382,15 +1771,15 @@
             "properties": {
                 "balance_rune": {
                     "type": "string",
-                    "description": "Amount of rune the pool has"
+                    "description": "amount of rune the pool has"
                 },
                 "balance_asset": {
                     "type": "string",
-                    "description": "Amount of asset the pool has"
+                    "description": "amount of asset the pool has"
                 },
                 "asset": {
                     "type": "string",
-                    "description": "the asset of the non-rune asset"
+                    "description": "pool asset"
                 },
                 "pool_units": {
                     "type": "string",
@@ -1398,48 +1787,19 @@
                 },
                 "status": {
                     "type": "string",
-                    "description": "the status of the pool"
-                }
-            }
-        },
-        "LiquidityProvider": {
-            "type": "object",
-            "properties": {
-                "asset": {
-                    "type": "string",
-                    "description": "the asset of the non-rune asset"
+                    "description": "status of the pool"
                 },
-                "rune_address": {
+                "synth_units": {
                     "type": "string",
-                    "description": "the rune address of the liquidity provider"
+                    "description": "total number of synth units within the pool"
                 },
-                "asset_address": {
+                "pending_inbound_rune": {
                     "type": "string",
-                    "description": "the non-rune asset address of the liquidity provider"
+                    "description": "amount of pending rune within the pool"
                 },
-                "last_add": {
+                "pending_inbound_asset": {
                     "type": "string",
-                    "description": "block height of the last add"
-                },
-                "last_withdraw": {
-                    "type": "string",
-                    "description": "block height of the last withdraw"
-                },
-                "units": {
-                    "type": "string",
-                    "description": "the total number of units of the pool"
-                },
-                "pending_rune": {
-                    "type": "string",
-                    "description": "rune that has been provided, but not committed yet. Awaiting a provision of the non-rune asset"
-                },
-                "pending_asset": {
-                    "type": "string",
-                    "description": "asset"
-                },
-                "pending_tx_id": {
-                    "type": "string",
-                    "description": "pending tx id"
+                    "description": "amount of pending asset within the pool"
                 }
             }
         },
@@ -1477,7 +1837,7 @@
                 }
             }
         },
-        "txSigners": {
+        "TxSigners": {
             "type": "object",
             "properties": {
                 "tx_id": {
@@ -1621,7 +1981,7 @@
                 }
             }
         },
-        "vault": {
+        "AsgardVault": {
             "type": "object",
             "properties": {
                 "block_height": {
@@ -1684,7 +2044,7 @@
                 }
             }
         },
-        "yggdrasilvault": {
+        "YggdrasilVault": {
             "type": "object",
             "properties": {
                 "block_height": {
@@ -1702,7 +2062,7 @@
                 },
                 "type": {
                     "type": "string",
-                    "description": "vault type , it could be asgard or yggdrasil"
+                    "description": "vault type, it could be asgard or yggdrasil"
                 },
                 "status_since": {
                     "type": "string",
@@ -1711,7 +2071,7 @@
                 "membership": {
                     "type": "array",
                     "items": {},
-                    "description": "a list of node public key , represent which nodes created this vault"
+                    "description": "a list of node public key, represent which nodes created this vault"
                 },
                 "chains": {
                     "type": "array",
@@ -1720,7 +2080,7 @@
                 },
                 "inbound_tx_count": {
                     "type": "string",
-                    "description": "number of inbound tx to this vault , across all chain"
+                    "description": "number of inbound tx to this vault, across all chain"
                 },
                 "outbound_tx_count": {
                     "type": "string",
@@ -1738,7 +2098,7 @@
                 },
                 "status": {
                     "type": "string",
-                    "description": "node status , it could be active , standby etc"
+                    "description": "node status, it could be active, standby etc"
                 },
                 "bond": {
                     "type": "string",
@@ -1755,7 +2115,7 @@
                 }
             }
         },
-        "network": {
+        "Network": {
             "type": "object",
             "properties": {
                 "bond_reward_rune": {
@@ -1769,10 +2129,18 @@
                 "total_reserve": {
                     "type": "string",
                     "description": "total amount of reserve in rune"
+                },
+                "burned_bep_2_rune": {
+                    "type": "string",
+                    "description": "total amount of burned BEP2 rune to native rune"
+                },
+                "burned_erc_20_rune": {
+                    "type": "string",
+                    "description": "total amount of burned ERC20 rune to native rune"
                 }
             }
         },
-        "inbound_addresses": {
+        "InboundAddresses": {
             "type": "object",
             "properties": {
                 "chain": {
@@ -1791,12 +2159,12 @@
                     "type": "boolean",
                     "description": "indicate whether this chain has halted"
                 },
-                "gas_rate (string) - gas rate, for ETH , it is in Gwei , for BTC/BCH/LTC it is gas_rate per vbyte": {
+                "gas_rate (string) - gas rate, for ETH, it is in Gwei, for BTC/BCH/LTC it is gas_rate per vbyte": {
                     "type": "string"
                 }
             }
         },
-        "last_block_height": {
+        "LastBlockHeight": {
             "type": "object",
             "properties": {
                 "chain": {
@@ -1804,21 +2172,20 @@
                     "description": "chain"
                 },
                 "last_observed_in": {
-                    "type": "string",
+                    "type": "number",
                     "description": "last observed in block height"
                 },
                 "last_sign_out": {
-                    "type": "string",
+                    "type": "number",
                     "description": "last sign out block height"
                 },
                 "thorchain": {
-                    "type": "string",
+                    "type": "number",
                     "description": "current thorchain block height"
                 }
             }
         },
-        "Get all last block height": {},
-        "version": {
+        "Version": {
             "type": "object",
             "properties": {
                 "current": {
@@ -1831,9 +2198,9 @@
                 }
             }
         },
-        "constants": {},
-        "ragnarok": {},
-        "outbound queue": {
+        "Constants": {},
+        "Ragnarok": {},
+        "OutboundQueue": {
             "type": "object",
             "properties": {
                 "swap": {
@@ -1850,8 +2217,7 @@
                 }
             }
         },
-        "outbound queue detail": {},
-        "keygen": {
+        "Keygen": {
             "type": "object",
             "properties": {
                 "keygen_block": {
@@ -1874,7 +2240,7 @@
                 }
             }
         },
-        "keysign": {
+        "Keysign": {
             "type": "object",
             "properties": {
                 "keysign": {
@@ -1894,6 +2260,47 @@
                 "signature": {
                     "type": "string",
                     "description": "base64 encoded signature of keysign"
+                }
+            }
+        },
+        "LiquidityProvider": {
+            "type": "object",
+            "properties": {
+                "asset": {
+                    "type": "string",
+                    "description": "the asset of the non-rune asset"
+                },
+                "rune_address": {
+                    "type": "string",
+                    "description": "the rune address of the liquidity provider"
+                },
+                "asset_address": {
+                    "type": "string",
+                    "description": "the non-rune asset address of the liquidity provider"
+                },
+                "last_add": {
+                    "type": "string",
+                    "description": "block height of the last add"
+                },
+                "last_withdraw": {
+                    "type": "string",
+                    "description": "block height of the last withdraw"
+                },
+                "units": {
+                    "type": "string",
+                    "description": "the total number of units of the pool"
+                },
+                "pending_rune": {
+                    "type": "string",
+                    "description": "rune that has been provided, but not committed yet. Awaiting a provision of the non-rune asset"
+                },
+                "pending_asset": {
+                    "type": "string",
+                    "description": "asset"
+                },
+                "pending_tx_id": {
+                    "type": "string",
+                    "description": "pending tx id"
                 }
             }
         },
@@ -1944,7 +2351,7 @@
                 }
             }
         },
-        "txoutitem": {
+        "TxOutItem": {
             "type": "object",
             "properties": {
                 "chain": {
@@ -2026,21 +2433,21 @@
             "description": "This section document Tx API resource"
         },
         {
-            "name": "nodes",
+            "name": "Nodes",
             "description": "This section document all the API for Node resource"
         },
         {
-            "name": "vaults"
+            "name": "Vaults"
         },
         {
-            "name": "network",
-            "description": "This section document all api related to network"
+            "name": "Network",
+            "description": "This section document all API related to THORChain network"
         },
         {
-            "name": "queue"
+            "name": "Queue"
         },
         {
-            "name": "keygen/keysign"
+            "name": "Keygen / Keysign"
         }
     ]
 }

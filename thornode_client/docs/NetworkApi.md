@@ -4,13 +4,58 @@ All URIs are relative to *https://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**get_all_last_block_height**](NetworkApi.md#get_all_last_block_height) | **GET** /thorchain/lastblock | Get all last block height
 [**get_constant_values_from_thor_chain**](NetworkApi.md#get_constant_values_from_thor_chain) | **GET** /thorchain/constants | Get constant values from THORChain
 [**get_current_network_version**](NetworkApi.md#get_current_network_version) | **GET** /thorchain/version | Get current network version
 [**get_inbound_addresses**](NetworkApi.md#get_inbound_addresses) | **GET** /thorchain/inbound_addresses | Get inbound addresses
 [**get_last_block_height_per_chain**](NetworkApi.md#get_last_block_height_per_chain) | **GET** /thorchain/lastblock/{chain} | Get last block height per chain
 [**get_network_data**](NetworkApi.md#get_network_data) | **GET** /thorchain/network | Get network data
-[**get_ragnarok_status**](NetworkApi.md#get_ragnarok_status) | **GET** /thorchain/ragnarok | Get ragnarok status
+[**get_ragnarok_status**](NetworkApi.md#get_ragnarok_status) | **GET** /thorchain/ragnarok | Get Ragnarok status
 
+
+# **get_all_last_block_height**
+> list[object] get_all_last_block_height()
+
+Get all last block height
+
+Retrieve lastest block infomation across all chains
+
+### Example
+```python
+from __future__ import print_function
+import time
+import thornode_client
+from thornode_client.rest import ApiException
+from pprint import pprint
+
+# create an instance of the API class
+api_instance = thornode_client.NetworkApi()
+
+try:
+    # Get all last block height
+    api_response = api_instance.get_all_last_block_height()
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling NetworkApi->get_all_last_block_height: %s\n" % e)
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+**list[object]**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **get_constant_values_from_thor_chain**
 > get_constant_values_from_thor_chain()
@@ -139,7 +184,7 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: Not defined
+ - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -160,7 +205,7 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = thornode_client.NetworkApi()
-chain = '\"BNB\"' # str | chain
+chain = 'BNB' # str | chain
 
 try:
     # Get last block height per chain
@@ -238,7 +283,7 @@ No authorization required
 # **get_ragnarok_status**
 > bool get_ragnarok_status()
 
-Get ragnarok status
+Get Ragnarok status
 
 
 
@@ -254,7 +299,7 @@ from pprint import pprint
 api_instance = thornode_client.NetworkApi()
 
 try:
-    # Get ragnarok status
+    # Get Ragnarok status
     api_response = api_instance.get_ragnarok_status()
     pprint(api_response)
 except ApiException as e:

@@ -16,12 +16,12 @@ from __future__ import absolute_import
 import unittest
 
 import thornode_client
-from thornode_client.models.yggdrasilvault import Yggdrasilvault  # noqa: E501
+from thornode_client.models.tx_out_item import TxOutItem  # noqa: E501
 from thornode_client.rest import ApiException
 
 
-class TestYggdrasilvault(unittest.TestCase):
-    """Yggdrasilvault unit test stubs"""
+class TestTxOutItem(unittest.TestCase):
+    """TxOutItem unit test stubs"""
 
     def setUp(self):
         pass
@@ -29,10 +29,10 @@ class TestYggdrasilvault(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def testYggdrasilvault(self):
-        """Test Yggdrasilvault"""
+    def testTxOutItem(self):
+        """Test TxOutItem"""
         # FIXME: construct object with mandatory attributes with example values
-        # model = thornode_client.models.yggdrasilvault.Yggdrasilvault()  # noqa: E501
+        # model = thornode_client.models.tx_out_item.TxOutItem()  # noqa: E501
         pass
 
 

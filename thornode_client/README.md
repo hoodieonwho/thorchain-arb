@@ -70,35 +70,38 @@ All URIs are relative to *https://localhost*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *HealthCheckApi* | [**ping**](docs/HealthCheckApi.md#ping) | **GET** /thorchain/ping | Ping
-*PoolsApi* | [**get_a_pool**](docs/PoolsApi.md#get_a_pool) | **GET** /thorchain/pool/{asset} | Get a pool
-*PoolsApi* | [**get_all_liquidity_providers_of_a_pool**](docs/PoolsApi.md#get_all_liquidity_providers_of_a_pool) | **GET** /thorchain/pool/{asset}/liquidity_providers | Get all liquidity providers of a pool
-*PoolsApi* | [**get_all_the_liquidity_pools**](docs/PoolsApi.md#get_all_the_liquidity_pools) | **GET** /thorchain/pools | Get all the liquidity pools
-*TxApi* | [**get_a_tx_with_given_hash**](docs/TxApi.md#get_a_tx_with_given_hash) | **GET** /thorchain/tx/{hash} | Get a tx with given hash
-*TxApi* | [**get_tx_signers**](docs/TxApi.md#get_tx_signers) | **GET** /thorchain/tx/{hash}/signers | Get tx signers
-*KeygenkeysignApi* | [**get_keygen**](docs/KeygenkeysignApi.md#get_keygen) | **GET** /thorchain/keygen/{height}/{pubkey} | get keygen
-*KeygenkeysignApi* | [**get_keysign**](docs/KeygenkeysignApi.md#get_keysign) | **GET** /thorchain/keysign/{height}/{pubkey} | Get keysign
+*KeygenKeysignApi* | [**get_keygen**](docs/KeygenKeysignApi.md#get_keygen) | **GET** /thorchain/keygen/{height}/{pubkey} | Get Keygen
+*KeygenKeysignApi* | [**get_keysign**](docs/KeygenKeysignApi.md#get_keysign) | **GET** /thorchain/keysign/{height}/{pubkey} | Get Keysign
+*NetworkApi* | [**get_all_last_block_height**](docs/NetworkApi.md#get_all_last_block_height) | **GET** /thorchain/lastblock | Get all last block height
 *NetworkApi* | [**get_constant_values_from_thor_chain**](docs/NetworkApi.md#get_constant_values_from_thor_chain) | **GET** /thorchain/constants | Get constant values from THORChain
 *NetworkApi* | [**get_current_network_version**](docs/NetworkApi.md#get_current_network_version) | **GET** /thorchain/version | Get current network version
 *NetworkApi* | [**get_inbound_addresses**](docs/NetworkApi.md#get_inbound_addresses) | **GET** /thorchain/inbound_addresses | Get inbound addresses
 *NetworkApi* | [**get_last_block_height_per_chain**](docs/NetworkApi.md#get_last_block_height_per_chain) | **GET** /thorchain/lastblock/{chain} | Get last block height per chain
 *NetworkApi* | [**get_network_data**](docs/NetworkApi.md#get_network_data) | **GET** /thorchain/network | Get network data
-*NetworkApi* | [**get_ragnarok_status**](docs/NetworkApi.md#get_ragnarok_status) | **GET** /thorchain/ragnarok | Get ragnarok status
+*NetworkApi* | [**get_ragnarok_status**](docs/NetworkApi.md#get_ragnarok_status) | **GET** /thorchain/ragnarok | Get Ragnarok status
 *NodesApi* | [**get_a_node**](docs/NodesApi.md#get_a_node) | **GET** /thorchain/node/{node_address} | Get a node
 *NodesApi* | [**get_all_nodes**](docs/NodesApi.md#get_all_nodes) | **GET** /thorchain/nodes | Get all nodes
-*QueueApi* | [**get_outbound_queue**](docs/QueueApi.md#get_outbound_queue) | **GET** /thorchain/queue | get outbound queue
-*QueueApi* | [**get_outbound_queue_detail**](docs/QueueApi.md#get_outbound_queue_detail) | **GET** /thorchain/queue/outbound | get outbound queue detail
-*VaultsApi* | [**get_a_vault_by_pubkey**](docs/VaultsApi.md#get_a_vault_by_pubkey) | **GET** /thorchain/vault/{pubkey} | get a vault by pubkey
-*VaultsApi* | [**get_all_yggdrasil_vaults**](docs/VaultsApi.md#get_all_yggdrasil_vaults) | **GET** /thorchain/vaults/yggdrasil | get all yggdrasil vaults
-*VaultsApi* | [**get_vault_pubkeys**](docs/VaultsApi.md#get_vault_pubkeys) | **GET** /thorchain/vaults/pubkeys | get vault pubkeys
+*PoolsApi* | [**get_a_liquidity_provider_of_a_pool**](docs/PoolsApi.md#get_a_liquidity_provider_of_a_pool) | **GET** /thorchain/pool/{asset}/liquidity_provider/{address} | Get a liquidity provider of a pool
+*PoolsApi* | [**get_a_pool**](docs/PoolsApi.md#get_a_pool) | **GET** /thorchain/pool/{asset} | Get a pool
+*PoolsApi* | [**get_all_liquidity_providers_of_a_pool**](docs/PoolsApi.md#get_all_liquidity_providers_of_a_pool) | **GET** /thorchain/pool/{asset}/liquidity_providers | Get all liquidity providers of a pool
+*PoolsApi* | [**get_all_the_liquidity_pools**](docs/PoolsApi.md#get_all_the_liquidity_pools) | **GET** /thorchain/pools | Get all the liquidity pools
+*QueueApi* | [**get_outbound_queue**](docs/QueueApi.md#get_outbound_queue) | **GET** /thorchain/queue | Get outbound queue
+*QueueApi* | [**get_outbound_queue_detail**](docs/QueueApi.md#get_outbound_queue_detail) | **GET** /thorchain/queue/outbound | Get outbound queue detail
+*TxApi* | [**get_a_tx_with_given_hash**](docs/TxApi.md#get_a_tx_with_given_hash) | **GET** /thorchain/tx/{hash} | Get a tx with given hash
+*TxApi* | [**get_tx_signers**](docs/TxApi.md#get_tx_signers) | **GET** /thorchain/tx/{hash}/signers | Get tx signers
+*VaultsApi* | [**get_a_vault_by_pubkey**](docs/VaultsApi.md#get_a_vault_by_pubkey) | **GET** /thorchain/vault/{pubkey} | Get a vault by pubkey
+*VaultsApi* | [**get_asgard_vaults**](docs/VaultsApi.md#get_asgard_vaults) | **GET** /thorchain/vaults/asgard | Get Asgard vaults
+*VaultsApi* | [**get_vault_pubkeys**](docs/VaultsApi.md#get_vault_pubkeys) | **GET** /thorchain/vaults/pubkeys | Get vault pubkeys
+*VaultsApi* | [**get_yggdrasil_vaults**](docs/VaultsApi.md#get_yggdrasil_vaults) | **GET** /thorchain/vaults/yggdrasil | Get Yggdrasil vaults
 
 
 ## Documentation For Models
 
+ - [AsgardVault](docs/AsgardVault.md)
  - [ChainAddress](docs/ChainAddress.md)
  - [ChainRouter](docs/ChainRouter.md)
  - [Coin](docs/Coin.md)
  - [Constants](docs/Constants.md)
- - [GetAllLastBlockHeight](docs/GetAllLastBlockHeight.md)
  - [InboundAddresses](docs/InboundAddresses.md)
  - [Keygen](docs/Keygen.md)
  - [Keysign](docs/Keysign.md)
@@ -108,16 +111,14 @@ Class | Method | HTTP request | Description
  - [Node](docs/Node.md)
  - [ObservedTx](docs/ObservedTx.md)
  - [OutboundQueue](docs/OutboundQueue.md)
- - [OutboundQueueDetail](docs/OutboundQueueDetail.md)
  - [Ping](docs/Ping.md)
  - [Pool](docs/Pool.md)
  - [Ragnarok](docs/Ragnarok.md)
  - [Tx](docs/Tx.md)
+ - [TxOutItem](docs/TxOutItem.md)
  - [TxSigners](docs/TxSigners.md)
- - [Txoutitem](docs/Txoutitem.md)
- - [Vault](docs/Vault.md)
  - [Version](docs/Version.md)
- - [Yggdrasilvault](docs/Yggdrasilvault.md)
+ - [YggdrasilVault](docs/YggdrasilVault.md)
 
 
 ## Documentation For Authorization

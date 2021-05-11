@@ -4,14 +4,14 @@ All URIs are relative to *https://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**get_outbound_queue**](QueueApi.md#get_outbound_queue) | **GET** /thorchain/queue | get outbound queue
-[**get_outbound_queue_detail**](QueueApi.md#get_outbound_queue_detail) | **GET** /thorchain/queue/outbound | get outbound queue detail
+[**get_outbound_queue**](QueueApi.md#get_outbound_queue) | **GET** /thorchain/queue | Get outbound queue
+[**get_outbound_queue_detail**](QueueApi.md#get_outbound_queue_detail) | **GET** /thorchain/queue/outbound | Get outbound queue detail
 
 
 # **get_outbound_queue**
 > object get_outbound_queue()
 
-get outbound queue
+Get outbound queue
 
 Retrieve the outbound queue information from THORChain
 
@@ -27,7 +27,7 @@ from pprint import pprint
 api_instance = thornode_client.QueueApi()
 
 try:
-    # get outbound queue
+    # Get outbound queue
     api_response = api_instance.get_outbound_queue()
     pprint(api_response)
 except ApiException as e:
@@ -55,9 +55,9 @@ No authorization required
 # **get_outbound_queue_detail**
 > list[object] get_outbound_queue_detail()
 
-get outbound queue detail
+Get outbound queue detail
 
-get the list of tx out item in the queue
+Get the list of tx out items in the queue
 
 ### Example
 ```python
@@ -71,7 +71,7 @@ from pprint import pprint
 api_instance = thornode_client.QueueApi()
 
 try:
-    # get outbound queue detail
+    # Get outbound queue detail
     api_response = api_instance.get_outbound_queue_detail()
     pprint(api_response)
 except ApiException as e:

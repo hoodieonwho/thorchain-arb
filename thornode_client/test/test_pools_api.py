@@ -29,6 +29,13 @@ class TestPoolsApi(unittest.TestCase):
     def tearDown(self):
         pass
 
+    def test_get_a_liquidity_provider_of_a_pool(self):
+        """Test case for get_a_liquidity_provider_of_a_pool
+
+        Get a liquidity provider of a pool  # noqa: E501
+        """
+        pass
+
     def test_get_a_pool(self):
         """Test case for get_a_pool
 
