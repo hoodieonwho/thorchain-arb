@@ -1,5 +1,5 @@
 # Recent Update
-This repo is in progress, I was able to already arb between ftx and thorchain MCCN on some pairs.
+This repo is in progress, I was able to already arb between ftx and thorchain MCCN using BUSD as a base asset.
 This arb is not ready for public use, you must understand the code in order to use it, this can serve
 as a basis for people who want to develop arb bots.
 I will be making updates to this repo constantly.
