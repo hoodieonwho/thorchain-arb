@@ -1,3 +1,19 @@
+# Recent Update
+This repo is in progress, I was able to already arb between ftx and thorchain MCCN on some pairs.
+This arb is not ready for public use, you must understand the code in order to use it, this can serve
+as a basis for people who want to develop arb bots.
+I will be making updates to this repo constantly.
+
+Donation:
+recently lost all my devices and some private key due to car robbery, would appreciate any donation:
+THORCHAIN:
+BNB: bnb1empnhqcjxc9uxjz2d0fz8vttszhyjjjufaalhv
+THOR: thor1uk7gnypj43z83m4uu94qn7vcwmj2estse0j2wk
+BTC: bc1q2qqmpyk4ffvuyxsmx5g0kf4n78djssml8c2z3c
+ETH: 0x953741e1864567cc7aa6b2b60528a955a550036e
+LTC: ltc1qvaqqzv059lhl22tdkgh40nrnj2tcuqzs92pf33
+
+
 # Installing Dependencies
 ## update midgard and thornode api client
 I am using siaskynet as a decentralized cloud for uploading swagger client
@@ -22,7 +38,12 @@ mkdir secret/
 python utils/thorchain_mnemonic.py
 ```
 `ls secret/` returns `real_mnemonic`
-
+### issue with 12 words mnemonic
+xchainpy_binance module has problem with 12 words mnemonic, using 24 words for now.
+``python
+words = Mnemonic(language).generate(strength=256)
+``
+### thorchain deposit function not available
 ## install xchainpy module
 
 ```python
