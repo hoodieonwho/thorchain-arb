@@ -2,7 +2,7 @@ import midgard_client
 from midgard_client.rest import ApiException as MidGardException
 import thornode_client
 from thornode_client.rest import ApiException as ThorNodeException
-import faster_than_requests as f_requests
+import requests
 import json
 import random
 import math
@@ -19,7 +19,6 @@ from xchainpy_util.asset import Asset
 from sys import getsizeof
 import ccxt.async_support as ccxt
 from ccxt.base.errors import RequestTimeout
-from faster_than_requests import NimPyException
 
 
 class ThorOracle:
@@ -98,12 +97,13 @@ class ThorOracle:
                 self.inbound_addresses = user_host_consensus[0]
                 return self.host
         try:
-            nodes = f_requests.get2json(self.seed_service)
-        except NimPyException as e:
+            headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
+            nodes = requests.get(self.seed_service, headers=headers).json()
+        except Exception as e:
             thornode_log.debug(f'requests error: {e}')
             time.sleep(5)
             return self.get_seed()
-        seeds = random.sample(json.loads(nodes), self.num_seeding)
+        seeds = random.sample(nodes, self.num_seeding)
         thornode_log.debug(f'Initial seeds: {seeds}')
         node_consensus = []
         # pull num_node from seed with inbound_addresses consensus

@@ -76,7 +76,7 @@ class Account:
             for balance in balances:
                 account_log.info(f'BNB DEX asset: {balance.asset} amount:{balance.amount}')
         else:
-            account_log.info("no balance")
+            account_log.info("BNB DEX: no balance")
         account_log.info(f'address: {address}')
         # ----------------- THOR
         # balance = await self.thor.get_balance()

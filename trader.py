@@ -18,11 +18,11 @@ MONGO = DB(cred=open("secret/mongodb", 'r').read())
 
 class FTXTrader:
     def __init__(self):
-        self.account = ccxt.ftx({'apiKey': f'{open("secret/ftx_api_key.txt").read()}',
-                                    'secret': f'{open("secret/ftx_api_secret.txt").read()}',
+        self.account = ccxt.ftx({'apiKey': f'{open("secret/ftx_api_key").read()}',
+                                    'secret': f'{open("secret/ftx_api_secret").read()}',
                                     'enableRateLimit': True,
                                     'headers': {'FTX-SUBACCOUNT': 'arb'}})
-        self.otp = pyotp.TOTP(open("secret/ftx_otp.txt").read());
+        self.otp = pyotp.TOTP(open("secret/ftx_otp").read())
         # self.thor = ThorOracle()
         self.precision = {'LTC': 2, 'BCH': 3, 'ETH': 3}
         self.market = []
