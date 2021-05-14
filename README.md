@@ -44,14 +44,30 @@ words = Mnemonic(language).generate(strength=256)
 ``
 ### thorchain deposit function not available
 ## install xchainpy module
-
+currently using testnet ethereum module
 ```python
-pip install xchainpy_ethereum xchainpy_bitcoin xchainpy_binance xchainpy_litecoin xchainpy_thorchain xchainpy_util
+pip install -i https://test.pypi.org/simple/ xchainpy-ethereum
+pip install xchainpy_bitcoin xchainpy_bitcoincash xchainpy_binance xchainpy_litecoin xchainpy_thorchain xchainpy_util
+
 ```
-### tips for arch user
-in case of arch linux, I needed to 
+### tips
+#### binance dex
+make sure you have some bnb to broadcast msg
+#### arch
 ```bash
 pacman -S libsecp256k1
+```
+#### mac with m1 chip
+you need to compile libsecp256k1 from source, then
+```bash
+CFLAGS="-Wno-error=implicit-function-declaration" pip install secp256k1
+```
+to install numpy:
+```bash
+pip install Cython
+git clone https://github.com/numpy/numpy.git
+cd numpy
+pip install . --no-binary :all: --no-use-pep517
 ```
 
 ## install cex module

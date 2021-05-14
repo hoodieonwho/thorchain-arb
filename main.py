@@ -8,6 +8,7 @@ from logger import get_logger, logging
 arb_log = get_logger("ARB", level=logging.DEBUG)
 cex_log = get_logger("CEX", level=logging.DEBUG)
 
+
 def thor_ops_handler(params):
     loop = asyncio.get_event_loop()
     loop.run_until_complete(thor_ops(**params))
@@ -97,6 +98,8 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
                                 addr = await cex_oracle.get_deposit_address(symbol=symbol)
                                 action_detail = await thor.swap(in_amount=thor_in, in_asset=unit_asset,
                                                                 out_asset=thor_asset, dest_addr=addr, wait=False)
+                                if not action_detail:
+                                    arb_log.warning("swap didn't go through")
                                 MONGO.post_action(action=action_detail)
                                 out_volume_order = cex_oracle.round_down(thor_asset_out, cex_oracle.precision[symbol])
                                 base_asset_balance = await cex_oracle.get_balance(symbol=symbol)
@@ -126,7 +129,7 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
 def main():
     # Declare your CEX Trader
     ftx = FTXTrader()
-    profile_1 = {'network': 'MCCN', 'unit_asset':'BNB.BUSD-BD1', 'trading_asset':['BCH.BCH'], 'cex_oracle': ftx, 'diff':4}
+    profile_1 = {'network': 'MCCN', 'unit_asset':'BNB.BUSD-BD1', 'trading_asset':['LTC.LTC','BCH.BCH'], 'cex_oracle': ftx, 'diff':4}
     thor_side = Process(target=thor_ops_handler(profile_1))
     thor_side.start()
 
