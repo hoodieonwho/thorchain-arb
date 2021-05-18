@@ -7,3 +7,6 @@ secret/
 tox.ini
 .travis.yml
 venv/
+.DS_Store
+dist/
+numpy/

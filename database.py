@@ -49,6 +49,6 @@ class DB:
         result = self.ftxtrader.drop()
         return result
 
-    def update_collection(self, filter, update):
+    def update_filtered_action(self, filter, update):
         result = self.ftxtrader.update_one(filter=filter, update={"$set": update})
         return result
