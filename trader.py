@@ -173,6 +173,9 @@ class THORTrader:
 
     async def swap(self, in_amount, in_asset: Asset, out_asset: Asset, dest_addr=None, wait=True):
         vault_addr = self.oracle.get_inbound_addresses(chain=in_asset.chain)
+        if not vault_addr:
+            THOR_TRADER_log.error("chain halted")
+            return False
         if not dest_addr:
             dest_addr = self.account.get_address(asset=out_asset)
         memo = f'{self.op_code["SWAP"]}:{str(out_asset)}:{dest_addr}'
@@ -183,8 +186,9 @@ class THORTrader:
             f'in_tx: {in_tx}'
         )
         in_tx_detail = self.oracle.get_thornode_tx_detail(tx_id=in_tx, block_time=self.oracle.BLOCKTIME[in_asset.chain])
-        out_tx = in_tx_detail["out_hashes"][0]
-        if out_tx:
+        if in_tx_detail:
+            out_tx = in_tx_detail["out_hashes"]
+            out_tx = out_tx[0]
             if not wait:
                 THOR_TRADER_log.info(f'not waiting mode - out_tx : {out_tx}')
                 return in_tx_detail
@@ -198,7 +202,7 @@ class THORTrader:
             THOR_TRADER_log.error(
                 f'tx_in {in_tx} failed'
             )
-            return 0
+            return False
 
 #
 # T = THORTrader(network="MCCN")

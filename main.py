@@ -58,21 +58,30 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
                 if base_asset_balance > float(out_volume_order):
                     cex_order = await cex_oracle.account.create_order(symbol=to_do['pair'], side=to_do['side'],
                                                                       amount=out_volume_order, type='market')
-                    cex_log.warning(f"sending cex market order{cex_oracle}")
-                    MONGO.update_collection(filter={'_id': to_do['_id']},
+                    cex_log.warning(f"sending cex market order{cex_order}")
+                    MONGO.update_filtered_action(filter={'_id': to_do['_id']},
                                             update={'status': 'cex_done', 'cex_tx': cex_order})
+                else:
+                    cex_log.warning("cex has no balance")
             # Define Base Asset Amount
             thor_ins = range(400, 700, 100)
-            if float(thor_ins[0]) > float(await thor.account.get_balance(unit_asset)):
-                arb_log.warning("not enough balance")
+            while True:
+                try:
+                    unit_asset_balance = await thor.account.get_balance(unit_asset)
+                    break
+                except Exception as e:
+                    arb_log.warning(f"exception calling get_balance{unit_asset}: {e}")
+                    time.sleep(1)
+            if float(thor_ins[-1]) > float(unit_asset_balance):
+                arb_log.warning(f"not enough balance {unit_asset_balance}")
                 ftx_balance = await cex_oracle.get_balance(symbol="USD")
                 cex_log.warning(f"your ftx balance: {ftx_balance}")
-                if not withdrawing:
+                if not withdrawing and float(ftx_balance) > 1 :
                     cex_log.info(f"withdrawing {ftx_balance} {unit_asset.symbol} from ftx")
                     # Withdraw from FTX
                     result = await cex_oracle.withdraw(asset="BUSD", amount=ftx_balance, addr=thor.account.get_address(unit_asset))
                     withdrawing = True
-                time.sleep(1)
+                time.sleep(thor.oracle.BLOCKTIME[unit_asset.chain]*5)
             else:
                 withdrawing = False
                 for thor_in in thor_ins:
@@ -100,7 +109,14 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
                                                                 out_asset=thor_asset, dest_addr=addr, wait=False)
                                 if not action_detail:
                                     arb_log.warning("swap didn't go through")
+                                    found = 1
+                                    break
                                 MONGO.post_action(action=action_detail)
+                                MONGO.post_filtered_action(action=action_detail,
+                                                           additional={'pair': f'{symbol}/{cex_base_asset}',
+                                                                       'side': 'sell',
+                                                                       'expected_out_amount': thor_asset_out,
+                                                                       'status': 'thor_done'})
                                 out_volume_order = cex_oracle.round_down(thor_asset_out, cex_oracle.precision[symbol])
                                 base_asset_balance = await cex_oracle.get_balance(symbol=symbol)
                                 if base_asset_balance > float(out_volume_order):
@@ -109,12 +125,8 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
                                                                                       amount=out_volume_order,
                                                                                       type='market')
                                     cex_log.warning(f"sending cex market order{cex_oracle}")
-                                    MONGO.post_filtered_action(action=action_detail,
-                                                               additional={'pair': f'{symbol}/{cex_base_asset}',
-                                                                           'side': 'sell',
-                                                                           'expected_out_amount': thor_asset_out,
-                                                                           'status': 'cex_done',
-                                                                           'cex_tx': cex_order})
+                                    MONGO.update_filtered_action(filter={'tx_id': action_detail['tx']["id"]},
+                                                                 update={'status': 'cex_done', 'cex_tx': cex_order})
                                 fast = True
                         # -----------------------------
                         # swap alt to base on THORChain, sell base back to alt on cex
