@@ -180,6 +180,8 @@ class THORTrader:
             dest_addr = self.account.get_address(asset=out_asset)
         memo = f'{self.op_code["SWAP"]}:{str(out_asset)}:{dest_addr}'
         in_tx = await self.account.thor_swap(asset=in_asset, amount=in_amount, recipient=vault_addr, memo=memo)
+        if not in_tx:
+            return False
         THOR_TRADER_log.info(
             f'sending {in_amount} {in_asset} to {vault_addr}\n'
             f'memo: {memo}\n'

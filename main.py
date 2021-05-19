@@ -28,7 +28,7 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
         # TODO
         # ADD SUPPORT FOR DIFFERENT BASE ASSET
     # Trading
-    thor = THORTrader(network=network, host=["134.209.137.123", "54.217.4.198"])
+    thor = THORTrader(network=network, host=["143.198.248.206", "34.214.69.203"])
 
     # Account Statement
     await thor.account.statement()
@@ -109,7 +109,6 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
                                                                 out_asset=thor_asset, dest_addr=addr, wait=False)
                                 if not action_detail:
                                     arb_log.warning("swap didn't go through")
-                                    found = 1
                                     break
                                 MONGO.post_action(action=action_detail)
                                 MONGO.post_filtered_action(action=action_detail,
@@ -124,7 +123,7 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
                                                                                       side='sell',
                                                                                       amount=out_volume_order,
                                                                                       type='market')
-                                    cex_log.warning(f"sending cex market order{cex_oracle}")
+                                    cex_log.warning(f"sending cex market order{cex_order}")
                                     MONGO.update_filtered_action(filter={'tx_id': action_detail['tx']["id"]},
                                                                  update={'status': 'cex_done', 'cex_tx': cex_order})
                                 fast = True
