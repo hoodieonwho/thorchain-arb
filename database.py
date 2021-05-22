@@ -11,7 +11,7 @@ class DB:
         self.profile = self.db.ltc_balance
 
     def post_balance(self, balance):
-
+        result = self.profile.insert_one(balance)
 
     def post_action(self, action):
         result = self.thortrader.insert_one(action)
