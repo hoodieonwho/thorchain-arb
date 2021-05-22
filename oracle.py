@@ -138,7 +138,8 @@ class ThorOracle:
             if node_active_consensus.count(node_active_consensus[0]) != length:
                 thornode_log.info("proofing 2/3 active nodes failed")
                 return None
-            elif node_active_consensus[0]["halted"]:
+            elif node_active_consensus[0][0]["halted"]:
+                print(node_active_consensus[0]["halted"])
                 return "halt"
             else:
                 self.inbound_addresses = node_active_consensus[0]
