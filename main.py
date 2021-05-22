@@ -42,7 +42,7 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
     # withdraw timer
     last_withdraw = time.perf_counter()
     cex_balance = await cex_oracle.get_balance(symbol="LTC")
-    thor_balance = await thor.account.get_balance(asset="BNB.BUSD-BD1")
+    thor_balance = await thor.account.get_balance(asset=Asset.from_str("BNB.BUSD-BD1"))
     MONGO.post_balance({"ltc": float(cex_balance), "BUSD": float(thor_balance), "nonce": 1})
     while found == 0:
         time.sleep(0.5)

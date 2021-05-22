@@ -21,7 +21,8 @@ class FTXTrader:
         self.account = ccxt.ftx({'apiKey': f'{open("secret/ftx_api_key").read()}',
                                     'secret': f'{open("secret/ftx_api_secret").read()}',
                                     'enableRateLimit': True,
-                                    'headers': {'FTX-SUBACCOUNT': 'arb'}})
+                                    'headers': {'FTX-SUBACCOUNT': 'arb'},
+                                    'adjustForTimeDifference': True})
         self.otp = pyotp.TOTP(open("secret/ftx_otp").read())
         # self.thor = ThorOracle()
         self.precision = {'LTC': 2, 'BCH': 3, 'ETH': 3}
