@@ -6,8 +6,12 @@ class DB:
     def __init__(self, cred):
         self.client = MongoClient(cred)
         self.db = self.client.arb
-        self.thortrader = self.db.thortrader
-        self.ftxtrader = self.db.ftxtrader
+        self.thortrader = self.db.ltc_logs
+        self.ftxtrader = self.db.ltc_trading
+        self.profile = self.db.ltc_balance
+
+    def post_balance(self, balance):
+
 
     def post_action(self, action):
         result = self.thortrader.insert_one(action)
