@@ -27,16 +27,23 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
         cex_base_asset = 'USD'
         # TODO
         # ADD SUPPORT FOR DIFFERENT BASE ASSET
+        # SUPPORT FOR ULTRA BURST MODE
+        # FOR IDEAL ARB, WE WANT HALF AND HALF
+        # IF THE ASSET IS NOT HALF HALF, WE HAVE TO TAKE THE RISK OF CEX DEPOSIT TIME
+        # SET TIMER FOR 2FA WITHDRAW
     # Trading
-    thor = THORTrader(network=network, host=["134.209.137.123", "54.217.4.198"])
-
+    thor = THORTrader(network=network, host=["143.198.248.206", "51.136.76.139", "159.65.212.234"])
     # Account Statement
     await thor.account.statement()
     # Market Price
     # thor.oracle.print_market_price()
     found = 0
     watch_only = False
-    withdrawing = False
+    # withdraw timer
+    last_withdraw = time.perf_counter()
+    cex_balance = await cex_oracle.get_balance(symbol="LTC")
+    thor_balance = await thor.account.get_balance(asset=Asset.from_str("BNB.BUSD-BD1"))
+    MONGO.post_balance({"ltc": float(cex_balance), "BUSD": float(thor_balance), "nonce": 1})
     while found == 0:
         time.sleep(0.5)
         for thor_asset in trading_asset:
@@ -47,7 +54,7 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
 
             # Get unfinished order from DataBase
             cex_log.debug("cex_watching")
-            to_do = MONGO.get_filtered_action(filter={'status': 'thor_done'})
+            to_do = MONGO.get_filtered_action(filter={"pair": f'{symbol}/{cex_base_asset}', 'status': 'thor_done'})
             if to_do:
                 cex_log.debug("Found a thordone")
                 pair = to_do['pair']
@@ -65,25 +72,13 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
                     cex_log.warning("cex has no balance")
             # Define Base Asset Amount
             thor_ins = range(400, 700, 100)
-            while True:
-                try:
-                    unit_asset_balance = await thor.account.get_balance(unit_asset)
-                    break
-                except Exception as e:
-                    arb_log.warning(f"exception calling get_balance{unit_asset}: {e}")
-                    time.sleep(1)
-            if float(thor_ins[-1]) > float(unit_asset_balance):
-                arb_log.warning(f"not enough balance {unit_asset_balance}")
-                ftx_balance = await cex_oracle.get_balance(symbol="USD")
-                cex_log.warning(f"your ftx balance: {ftx_balance}")
-                if not withdrawing and float(ftx_balance) > 1 :
-                    cex_log.info(f"withdrawing {ftx_balance} {unit_asset.symbol} from ftx")
-                    # Withdraw from FTX
-                    result = await cex_oracle.withdraw(asset="BUSD", amount=ftx_balance, addr=thor.account.get_address(unit_asset))
-                    withdrawing = True
-                time.sleep(thor.oracle.BLOCKTIME[unit_asset.chain]*5)
+            ftx_balance = await cex_oracle.get_balance(symbol=cex_base_asset)
+            if time.perf_counter() > last_withdraw + 30 and ftx_balance > thor_ins[0]:
+                cex_log.info(f"withdrawing {ftx_balance} {unit_asset.symbol} from ftx")
+                # Withdraw from FTX
+                result = await cex_oracle.withdraw(asset="BUSD", amount=ftx_balance, addr=thor.account.get_address(unit_asset))
+                last_withdraw = time.perf_counter()
             else:
-                withdrawing = False
                 for thor_in in thor_ins:
                     fast = True
                     while fast is True:
@@ -109,7 +104,6 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
                                                                 out_asset=thor_asset, dest_addr=addr, wait=False)
                                 if not action_detail:
                                     arb_log.warning("swap didn't go through")
-                                    found = 1
                                     break
                                 MONGO.post_action(action=action_detail)
                                 MONGO.post_filtered_action(action=action_detail,
@@ -124,7 +118,7 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
                                                                                       side='sell',
                                                                                       amount=out_volume_order,
                                                                                       type='market')
-                                    cex_log.warning(f"sending cex market order{cex_oracle}")
+                                    cex_log.warning(f"sending cex market order{cex_order}")
                                     MONGO.update_filtered_action(filter={'tx_id': action_detail['tx']["id"]},
                                                                  update={'status': 'cex_done', 'cex_tx': cex_order})
                                 fast = True
@@ -141,7 +135,7 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
 def main():
     # Declare your CEX Trader
     ftx = FTXTrader()
-    profile_1 = {'network': 'MCCN', 'unit_asset':'BNB.BUSD-BD1', 'trading_asset':['LTC.LTC','BCH.BCH'], 'cex_oracle': ftx, 'diff':4}
+    profile_1 = {'network': 'MCCN', 'unit_asset':'BNB.BUSD-BD1', 'trading_asset':['LTC.LTC'], 'cex_oracle': ftx, 'diff':4}
     thor_side = Process(target=thor_ops_handler(profile_1))
     thor_side.start()
 

@@ -87,9 +87,12 @@ class Account:
     async def thor_swap(self, asset: Asset, amount, recipient, memo):
         tx = ''
         if asset.chain == 'BNB':
-            tx = await self.bnb_dex.transfer(asset=asset, amount=amount,
-                                             recipient=recipient, memo=memo)
-            account_log.debug(f'TX: {tx}')
+            try:
+                tx = await self.bnb_dex.transfer(asset=asset, amount=amount,
+                                                 recipient=recipient, memo=memo)
+                account_log.debug(f'TX: {tx}')
+            except Exception as e:
+                return 0
         elif asset.chain == 'THOR':
             tx = await self.thor.transfer(asset=asset, amount=amount, recipient=recipient, memo=memo)
             account_log.debug(f'TX: {tx}')

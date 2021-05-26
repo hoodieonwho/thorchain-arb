@@ -21,7 +21,8 @@ class FTXTrader:
         self.account = ccxt.ftx({'apiKey': f'{open("secret/ftx_api_key").read()}',
                                     'secret': f'{open("secret/ftx_api_secret").read()}',
                                     'enableRateLimit': True,
-                                    'headers': {'FTX-SUBACCOUNT': 'arb'}})
+                                    'headers': {'FTX-SUBACCOUNT': 'arb'},
+                                    'adjustForTimeDifference': True})
         self.otp = pyotp.TOTP(open("secret/ftx_otp").read())
         # self.thor = ThorOracle()
         self.precision = {'LTC': 2, 'BCH': 3, 'ETH': 3}
@@ -180,6 +181,8 @@ class THORTrader:
             dest_addr = self.account.get_address(asset=out_asset)
         memo = f'{self.op_code["SWAP"]}:{str(out_asset)}:{dest_addr}'
         in_tx = await self.account.thor_swap(asset=in_asset, amount=in_amount, recipient=vault_addr, memo=memo)
+        if not in_tx:
+            return False
         THOR_TRADER_log.info(
             f'sending {in_amount} {in_asset} to {vault_addr}\n'
             f'memo: {memo}\n'
