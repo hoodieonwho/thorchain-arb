@@ -24,7 +24,6 @@ class FTXTrader:
                                     'headers': {'FTX-SUBACCOUNT': 'arb'},
                                     'adjustForTimeDifference': True})
         self.otp = pyotp.TOTP(open("secret/ftx_otp").read())
-        # self.thor = ThorOracle()
         self.precision = {'LTC': 2, 'BCH': 3, 'ETH': 3}
         self.market = []
         self.logistics = defaultdict(list)
