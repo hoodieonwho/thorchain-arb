@@ -92,6 +92,7 @@ class Account:
                                                  recipient=recipient, memo=memo)
                 account_log.debug(f'TX: {tx}')
             except Exception as e:
+                account_log.debug(f'exception{e}')
                 return 0
         elif asset.chain == 'THOR':
             tx = await self.thor.transfer(asset=asset, amount=amount, recipient=recipient, memo=memo)

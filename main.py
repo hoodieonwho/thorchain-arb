@@ -6,7 +6,7 @@ from xchainpy_util.asset import Asset
 from database import DB
 from logger import get_logger, logging
 arb_log = get_logger("ARB", level=logging.DEBUG)
-cex_log = get_logger("CEX", level=logging.INFO)
+cex_log = get_logger("CEX", level=logging.DEBUG)
 
 
 def thor_ops_handler(params):
@@ -32,7 +32,7 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
         # IF THE ASSET IS NOT HALF HALF, WE HAVE TO TAKE THE RISK OF CEX DEPOSIT TIME
         # SET TIMER FOR 2FA WITHDRAW
     # Trading
-    thor = THORTrader(network=network, host=["143.198.248.206", "51.136.76.139", "159.65.212.234"])
+    thor = THORTrader(network=network, host=["143.198.248.206", "51.136.76.139", "18.135.194.109"])
     # Account Statement
     await thor.account.statement()
     # Market Price
@@ -40,7 +40,7 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
     found = 0
     watch_only = False
     # withdraw timer
-    last_withdraw = time.perf_counter()
+    last_withdraw = 0
     cex_balance = await cex_oracle.get_balance(symbol="LTC")
     thor_balance = await thor.account.get_balance(asset=Asset.from_str("BNB.BUSD-BD1"))
     MONGO.post_balance({"ltc": float(cex_balance), "BUSD": float(thor_balance), "nonce": 1})
@@ -135,7 +135,7 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
 def main():
     # Declare your CEX Trader
     ftx = FTXTrader()
-    profile_1 = {'network': 'MCCN', 'unit_asset':'BNB.BUSD-BD1', 'trading_asset':['LTC.LTC'], 'cex_oracle': ftx, 'diff':4}
+    profile_1 = {'network': 'MCCN', 'unit_asset':'BNB.BUSD-BD1', 'trading_asset':['LTC.LTC'], 'cex_oracle': ftx, 'diff':2}
     thor_side = Process(target=thor_ops_handler(profile_1))
     thor_side.start()
 

@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 from logger import get_logger, logging
 midgard_log = get_logger("midgard", level=logging.DEBUG)
-thornode_log = get_logger("thornode", level=logging.INFO)
+thornode_log = get_logger("thornode", level=logging.DEBUG)
 user_log = get_logger("user", level=logging.DEBUG)
 ftx_log = get_logger("ftx", level=logging.DEBUG)
 from urllib3.exceptions import MaxRetryError
@@ -315,6 +315,7 @@ class ThorOracle:
                     time.sleep(1)
                 else:
                     thornode_log.debug(f'exception calling get_tx: {e}')
+                    time.sleep(1)
             time.sleep(block_time)
             i += 1
         thornode_log.info(f'looking up timed out')
