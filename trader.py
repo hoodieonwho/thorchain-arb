@@ -6,8 +6,8 @@ from ccxt.base.decimal_to_precision import TRUNCATE
 from collections import defaultdict
 from xchainpy_util.asset import Asset
 from logger import get_logger, logging
-THOR_TRADER_log = get_logger("THOR:TRADER", level=logging.DEBUG)
-FTX_TRADER_log = get_logger("FTX:TRADER", level=logging.DEBUG)
+THOR_TRADER_log = get_logger("THOR:TRADER", level=logging.INFO)
+FTX_TRADER_log = get_logger("FTX:TRADER", level=logging.INFO)
 import ccxt.async_support as ccxt
 from ccxt.base.errors import RequestTimeout
 from ccxt.base.decimal_to_precision import decimal_to_precision, number_to_string, TRUNCATE
@@ -15,6 +15,7 @@ import time
 import pyotp
 from database import DB
 MONGO = DB(cred=open("secret/mongodb", 'r').read())
+
 
 class FTXTrader:
     def __init__(self):
@@ -30,13 +31,18 @@ class FTXTrader:
         self.backlog = []
 
     async def get_balance(self, symbol=None):
-        balance = await self.account.fetch_balance()
-        if symbol:
-            if symbol in balance:
-                balance = float(balance[symbol]['free'])
-            else:
-                balance = 0
-        return balance
+        while True:
+            try:
+                balance = await self.account.fetch_balance()
+                if symbol:
+                    if symbol in balance:
+                        balance = float(balance[symbol]['free'])
+                    else:
+                        balance = 0
+                return balance
+            except RequestTimeout or Exception as e:
+                FTX_TRADER_log.warn(f"get_balance timed out{e}")
+                time.sleep(1)
 
     async def statement(self):
         # ----------------- FTX
@@ -102,7 +108,7 @@ class FTXTrader:
 
     async def get_precision(self, pair_name):
         pairs = next(filter(lambda pair: pair_name == pair['info']['name'], self.market))
-        FTX_TRADER_log.info(f'FTX:PAIR:{pairs}')
+        FTX_TRADER_log.info(f'PAIR:{pairs}')
         return pairs['precision']['amount']
 
     async def parse_pair(self, base_asset):
@@ -117,7 +123,7 @@ class FTXTrader:
 
     async def estimate_swap_output(self, pair, amount, side, depth=10):
         bids, asks = await self.get_depth(pair, depth, amount*1.5)
-        FTX_TRADER_log.info(f'estimating output for pair: {pair} '
+        FTX_TRADER_log.debug(f'estimating output for pair: {pair} '
                             f'direction {side}\n')
         if side == 'buy':
             o_price = asks[0]
@@ -125,7 +131,7 @@ class FTXTrader:
             for i in range(depth):
                 if o_volume[i] > amount:
                     output = amount / o_price[i]
-                    FTX_TRADER_log.info(f'FTX: {amount} base = {output} quote')
+                    FTX_TRADER_log.info(f'{amount} {pair.split("/")[0]} = {output} {pair.split("/")[1]}')
                     return output
             return 0
         elif side == 'sell':
@@ -134,7 +140,7 @@ class FTXTrader:
             for i in range(depth):
                 if o_volume[i] * o_price[i] > amount:
                     output = amount * o_price[i]
-                    FTX_TRADER_log.info(f'FTX: {amount} quote = {output} base')
+                    FTX_TRADER_log.info(f'{amount} {pair.split("/")[0]} = {output} {pair.split("/")[1]}')
                     return output
             return 0
         else:
@@ -163,11 +169,14 @@ class THORTrader:
         output_before_fee = self.oracle.get_swap_output(in_amount, str(in_asset), str(out_asset))
         network_fee = self.oracle.get_network_fee(in_asset, out_asset)
         output_after_fee = output_before_fee - network_fee
-        THOR_TRADER_log.info(
+        THOR_TRADER_log.debug(
             f'input: {in_amount} {in_asset}\n'
             f'expected network fee: {network_fee} {out_asset.symbol}\n'
             f'expected output before network: {output_before_fee} {out_asset}\n'
             f'expected output after network fee: {output_after_fee} {out_asset}\n'
+        )
+        THOR_TRADER_log.info(
+            f'{in_amount} {in_asset} = {output_after_fee} {out_asset}'
         )
         return output_after_fee
 

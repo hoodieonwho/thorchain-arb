@@ -6,7 +6,7 @@ from xchainpy_util.asset import Asset
 from database import DB
 from logger import get_logger, logging
 arb_log = get_logger("ARB", level=logging.DEBUG)
-cex_log = get_logger("CEX", level=logging.DEBUG)
+cex_log = get_logger("CEX", level=logging.INFO)
 
 
 def thor_ops_handler(params):

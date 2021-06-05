@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 from logger import get_logger, logging
 midgard_log = get_logger("midgard", level=logging.DEBUG)
-thornode_log = get_logger("thornode", level=logging.DEBUG)
+thornode_log = get_logger("thornode", level=logging.INFO)
 user_log = get_logger("user", level=logging.DEBUG)
 ftx_log = get_logger("ftx", level=logging.DEBUG)
 from urllib3.exceptions import MaxRetryError
