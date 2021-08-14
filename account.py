@@ -1,42 +1,41 @@
 import asyncio
-from xchainpy_ethereum.client import Client as EthereumClient
-from xchainpy_bitcoin.client import Client as BitcoinClient
-from xchainpy_binance.client import Client as BinanceClient
-from xchainpy_litecoin.client import Client as LitecoinClient
-from xchainpy_thorchain.client import Client as THORChainClient
+from . import EthereumClient, BinanceClient, BitcoinClient, LitecoinClient, THORChainClient, BitcoinCashClient
+from xchainpy_client.models.types import XChainClientParams, Network
 from xchainpy_util.asset import Asset
 from logger import get_logger, logging
 account_log = get_logger("account", level=logging.DEBUG)
 
 
-MNEMONICFILE = "secret/real_mnemonic"
-NETWORK = 'mainnet'  # ropsten for eth testnet
+MNEMONICFILE = "secret/test_mnemonic"
+ETH_NETWORK = 'ropsten'  # ropsten for eth testnet
+params = XChainClientParams(network=Network.Testnet, phrase=open(f'resources/{ETH_NETWORK}/network', 'r').read())
 
 
 def init_eth():
     return EthereumClient(phrase=open(MNEMONICFILE, 'r').read(),
-                          network=open(f'resources/{NETWORK}/network', 'r').read(),
-                          network_type=NETWORK,
+                          network=open(f'resources/{ETH_NETWORK}/network', 'r').read(),
+                          network_type=ETH_NETWORK,
                           ether_api=open("resources/ether_api", 'r').read())
 
 
 def init_btc():
-    return BitcoinClient(phrase=open(MNEMONICFILE, 'r').read(),
-                         network=NETWORK)
+    return BitcoinClient(phrase=open(MNEMONICFILE, 'r').read())
 
 
-def init_bnb_dex():
-    return BinanceClient(phrase=open(MNEMONICFILE, 'r').read(),
-                         network=NETWORK)
+def init_bnb():
+    return BinanceClient(params)
 
 
 def init_ltc():
-    return LitecoinClient(phrase=open(MNEMONICFILE, 'r').read(),
-                          network=NETWORK)
+    return LitecoinClient(phrase=open(MNEMONICFILE, 'r').read())
+
 
 def init_thor():
-    return THORChainClient(phrase=open(MNEMONICFILE, 'r').read(),
-                          network=NETWORK)
+    return THORChainClient(phrase=open(MNEMONICFILE, 'r').read())
+
+
+def init_bch():
+    return BitcoinCashClient(phrase=open(MNEMONICFILE, 'r').read())
 
 
 class Account:
@@ -45,7 +44,8 @@ class Account:
         self.eth = init_eth()
         # self.eth.set_gas_strategy("fast")
         self.ltc = init_ltc()
-        self.bnb_dex = init_bnb_dex()
+        self.bnb_dex = init_bnb()
+        self.bch = init_bch()
         self.thor = init_thor()
 
     async def statement(self):
