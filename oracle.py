@@ -315,6 +315,7 @@ class ThorOracle:
                     time.sleep(1)
                 else:
                     thornode_log.debug(f'exception calling get_tx: {e}')
+                    time.sleep(1)
             time.sleep(block_time)
             i += 1
         thornode_log.info(f'looking up timed out')
