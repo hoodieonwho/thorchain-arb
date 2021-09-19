@@ -7,8 +7,6 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 from trader import THORTrader
 from xchainpy_util.asset import Asset
-from database import DB
-from logger import get_logger, logging
 
 def thor_ops_handler(params):
     loop = asyncio.get_event_loop()
@@ -28,7 +26,7 @@ async def thor_ops(network, unit_asset):
 
     # Account Statement
     await thor.account.statement()
-    hash = await thor.account.bnb_dex.transfer(
+    hash = await thor.account.bnb.transfer(
         asset=unit_asset, amount=10, recipient="bnb1empnhqcjxc9uxjz2d0fz8vttszhyjjjufaalhv"
     )
     print(hash)

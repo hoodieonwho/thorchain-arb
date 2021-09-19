@@ -14,7 +14,6 @@ from ccxt.base.decimal_to_precision import decimal_to_precision, number_to_strin
 import time
 import pyotp
 from database import DB
-MONGO = DB(cred=open("secret/mongodb", 'r').read())
 
 
 class FTXTrader:
@@ -158,6 +157,7 @@ class FTXTrader:
     # send usd to wallet in some times
 
 
+
 class THORTrader:
     op_code = {"ADD": '+', "WITHDRAW": '-', "SWAP": '=', "DONATE": '%'}
 
@@ -181,10 +181,12 @@ class THORTrader:
         return output_after_fee
 
     async def swap(self, in_amount, in_asset: Asset, out_asset: Asset, dest_addr=None, wait=True):
-        vault_addr = self.oracle.get_inbound_addresses(chain=in_asset.chain)
-        if not vault_addr:
-            THOR_TRADER_log.error("chain halted")
-            return False
+        vault_addr = ""
+        if in_asset.chain != "THOR":
+            vault_addr = self.oracle.get_inbound_addresses(chain=in_asset.chain)
+            if not vault_addr:
+                THOR_TRADER_log.error("chain halted")
+                return False
         if not dest_addr:
             dest_addr = self.account.get_address(asset=out_asset)
         memo = f'{self.op_code["SWAP"]}:{str(out_asset)}:{dest_addr}'
@@ -196,6 +198,17 @@ class THORTrader:
             f'memo: {memo}\n'
             f'in_tx: {in_tx}'
         )
+        old_amount = 0
+        for b in await self.account.bnb.get_balance(address=self.account.bnb.get_address()):
+            if b.asset.symbol !="BNB":
+                old_amount = b.amount
+                print(f"old: {b.asset} : {b.amount}")
+        new_amount = 0
+        while float(new_amount) <= float(old_amount):
+            for b in await self.account.bnb.get_balance(address=self.account.bnb.get_address()):
+                if b.asset.symbol != "BNB":
+                    new_amount = b.amount
+                    print(float(b.amount) - float(old_amount))
         in_tx_detail = self.oracle.get_thornode_tx_detail(tx_id=in_tx, block_time=self.oracle.BLOCKTIME[in_asset.chain])
         if in_tx_detail:
             out_tx = in_tx_detail["out_hashes"]

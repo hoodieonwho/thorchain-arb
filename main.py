@@ -16,11 +16,7 @@ def thor_ops_handler(params):
 
 
 async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
-    # Configuration
     await cex_oracle.parse_market()
-    cred = open("secret/mongodb", 'r')
-    MONGO = DB(cred=cred.read())
-    cred.close()
     unit_asset = Asset.from_str(unit_asset)
     cex_base_asset = unit_asset.symbol
     if 'BUSD' in cex_base_asset:
@@ -31,6 +27,7 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
         # FOR IDEAL ARB, WE WANT HALF AND HALF
         # IF THE ASSET IS NOT HALF HALF, WE HAVE TO TAKE THE RISK OF CEX DEPOSIT TIME
         # SET TIMER FOR 2FA WITHDRAW
+
     # Trading
     thor = THORTrader(network=network, host=["143.198.248.206", "51.136.76.139", "18.135.194.109"])
     # Account Statement
@@ -132,13 +129,11 @@ async def thor_ops(network, unit_asset, trading_asset, cex_oracle, diff):
     await cex_oracle.account.close()
 
 
-def main():
+if __name__ == "__main__":
     # Declare your CEX Trader
     ftx = FTXTrader()
-    profile_1 = {'network': 'MCCN', 'unit_asset':'BNB.BUSD-BD1', 'trading_asset':['LTC.LTC'], 'cex_oracle': ftx, 'diff':2}
-    thor_side = Process(target=thor_ops_handler(profile_1))
+    profile = {'network': 'MCCN', 'unit_asset': 'BNB.BUSD-BD1',
+               'trading_asset': ['LTC.LTC'], 'cex_oracle': ftx,
+               'diff': 2}
+    thor_side = Process(target=thor_ops_handler(profile))
     thor_side.start()
-
-
-if __name__ == "__main__":
-    main()

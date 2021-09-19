@@ -15,7 +15,6 @@ Method | HTTP request | Description
 [**get_nodes**](DefaultApi.md#get_nodes) | **GET** /v2/nodes | Nodes List
 [**get_pool**](DefaultApi.md#get_pool) | **GET** /v2/pool/{asset} | Details of a Pool
 [**get_pool_stats**](DefaultApi.md#get_pool_stats) | **GET** /v2/pool/{asset}/stats | Pool Statistics
-[**get_pool_stats_legacy**](DefaultApi.md#get_pool_stats_legacy) | **GET** /v2/pool/{asset}/stats/legacy | Pool Statistics (v1 naming)
 [**get_pools**](DefaultApi.md#get_pools) | **GET** /v2/pools | Pools List
 [**get_proxied_constants**](DefaultApi.md#get_proxied_constants) | **GET** /v2/thorchain/constants | Proxied THORChain Constants
 [**get_proxied_inbound_addresses**](DefaultApi.md#get_proxied_inbound_addresses) | **GET** /v2/thorchain/inbound_addresses | Proxied THORChain Inbound Addresses
@@ -24,10 +23,12 @@ Method | HTTP request | Description
 [**get_proxied_queue**](DefaultApi.md#get_proxied_queue) | **GET** /v2/thorchain/queue | Proxied THORChain Queue
 [**get_stats**](DefaultApi.md#get_stats) | **GET** /v2/stats | Global Stats
 [**get_swap_history**](DefaultApi.md#get_swap_history) | **GET** /v2/history/swaps | Swaps History
+[**get_thor_name_detail**](DefaultApi.md#get_thor_name_detail) | **GET** /v2/thorname/lookup/{name} | THORName Details
+[**get_thor_names_by_address**](DefaultApi.md#get_thor_names_by_address) | **GET** /v2/thorname/rlookup/{address} | Gives a list of THORNames by reverse lookup
 [**get_tvl_history**](DefaultApi.md#get_tvl_history) | **GET** /v2/history/tvl | Total Value Locked History
 
 # **get_actions**
-> InlineResponse200 get_actions(limit, offset, address=address, txid=txid, asset=asset, type=type)
+> InlineResponse200 get_actions(address=address, txid=txid, asset=asset, type=type, limit=limit, offset=offset)
 
 Actions List
 
@@ -43,16 +44,16 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = midgard_client.DefaultApi()
-limit = 789 # int | pagination limit
-offset = 789 # int | pagination offset
 address = 'address_example' # str | Comma separated list. Address of sender or recipient of any in/out transaction related to the action.  (optional)
 txid = 'txid_example' # str | ID of any in/out tx related to the action (optional)
 asset = 'asset_example' # str | Any asset that is part of the action (CHAIN.SYMBOL) (optional)
 type = 'type_example' # str | One or more comma separated unique types of action (swap, addLiquidity, withdraw, donate, refund, switch)  (optional)
+limit = 789 # int | number of actions returned, default is 50 (optional)
+offset = 789 # int | pagination offset, default is 0 (optional)
 
 try:
     # Actions List
-    api_response = api_instance.get_actions(limit, offset, address=address, txid=txid, asset=asset, type=type)
+    api_response = api_instance.get_actions(address=address, txid=txid, asset=asset, type=type, limit=limit, offset=offset)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling DefaultApi->get_actions: %s\n" % e)
@@ -62,12 +63,12 @@ except ApiException as e:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **limit** | **int**| pagination limit | 
- **offset** | **int**| pagination offset | 
  **address** | **str**| Comma separated list. Address of sender or recipient of any in/out transaction related to the action.  | [optional] 
  **txid** | **str**| ID of any in/out tx related to the action | [optional] 
  **asset** | **str**| Any asset that is part of the action (CHAIN.SYMBOL) | [optional] 
  **type** | **str**| One or more comma separated unique types of action (swap, addLiquidity, withdraw, donate, refund, switch)  | [optional] 
+ **limit** | **int**| number of actions returned, default is 50 | [optional] 
+ **offset** | **int**| pagination offset, default is 0 | [optional] 
 
 ### Return type
 
@@ -576,54 +577,6 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **get_pool_stats_legacy**
-> PoolLegacyDetail get_pool_stats_legacy(asset)
-
-Pool Statistics (v1 naming)
-
-Legacy, V1 style names for backward compatibility. Please migrate to GetPoolStats, check the fields documentation for details. 
-
-### Example
-```python
-from __future__ import print_function
-import time
-import midgard_client
-from midgard_client.rest import ApiException
-from pprint import pprint
-
-# create an instance of the API class
-api_instance = midgard_client.DefaultApi()
-asset = 'asset_example' # str | pool name
-
-try:
-    # Pool Statistics (v1 naming)
-    api_response = api_instance.get_pool_stats_legacy(asset)
-    pprint(api_response)
-except ApiException as e:
-    print("Exception when calling DefaultApi->get_pool_stats_legacy: %s\n" % e)
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **asset** | **str**| pool name | 
-
-### Return type
-
-[**PoolLegacyDetail**](PoolLegacyDetail.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
 # **get_pools**
 > PoolDetails get_pools(status=status)
 
@@ -980,6 +933,102 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**SwapHistory**](SwapHistory.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **get_thor_name_detail**
+> THORNameDetails get_thor_name_detail(name)
+
+THORName Details
+
+Returns an array of chains and their addresses associated with the given THORName
+
+### Example
+```python
+from __future__ import print_function
+import time
+import midgard_client
+from midgard_client.rest import ApiException
+from pprint import pprint
+
+# create an instance of the API class
+api_instance = midgard_client.DefaultApi()
+name = 'name_example' # str | a THORName
+
+try:
+    # THORName Details
+    api_response = api_instance.get_thor_name_detail(name)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling DefaultApi->get_thor_name_detail: %s\n" % e)
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **name** | **str**| a THORName | 
+
+### Return type
+
+[**THORNameDetails**](THORNameDetails.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **get_thor_names_by_address**
+> ReverseTHORNames get_thor_names_by_address(address)
+
+Gives a list of THORNames by reverse lookup
+
+Returns an array of THORNames associated with the given address
+
+### Example
+```python
+from __future__ import print_function
+import time
+import midgard_client
+from midgard_client.rest import ApiException
+from pprint import pprint
+
+# create an instance of the API class
+api_instance = midgard_client.DefaultApi()
+address = 'address_example' # str | Address to match THORNames against.
+
+try:
+    # Gives a list of THORNames by reverse lookup
+    api_response = api_instance.get_thor_names_by_address(address)
+    pprint(api_response)
+except ApiException as e:
+    print("Exception when calling DefaultApi->get_thor_names_by_address: %s\n" % e)
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **address** | **str**| Address to match THORNames against. | 
+
+### Return type
+
+[**ReverseTHORNames**](ReverseTHORNames.md)
 
 ### Authorization
 

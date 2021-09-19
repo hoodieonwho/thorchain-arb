@@ -78,6 +78,7 @@ class ThorOracle:
 
     def get_seed(self):
         """Return ⌈2/3⌉ proofed active node ips and parse inbound_addresses"""
+        # User specified host list
         if self.host:
             user_host_consensus = []
             # proof and return user specified host
@@ -96,6 +97,7 @@ class ThorOracle:
             else:
                 self.inbound_addresses = user_host_consensus[0]
                 return self.host
+        # Parsed host list
         try:
             headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
             nodes = requests.get(self.seed_service, headers=headers).json()
@@ -152,6 +154,7 @@ class ThorOracle:
             while True:
                 self.seeds = self.get_seed()
                 if self.seeds == "halt":
+                    thornode_log.warn("chain is halted")
                     return None
                 elif self.seeds:
                     self.seed_time = datetime.utcnow()
@@ -291,7 +294,7 @@ class ThorOracle:
         while i < timeout:
             try:
                 self.thorNode_tx.api_client.configuration.host = f'http://{self.seeds[0]}:1317'
-                tx_detail = self.thorNode_tx.get_a_tx_with_given_hash(hash=tx_id)
+                tx_detail = self.thorNode_tx.get_a_tx_with_given_hash(tx_id)
                 if tx_detail:
                     tx_detail = tx_detail["observed_tx"]
                     thornode_log.info(f'tx found: {tx_id}')
@@ -332,16 +335,20 @@ class ThorOracle:
         asset_rune_weigh = int(pool["balance_rune"]) / int(pool["balance_asset"])
         return asset_rune_weigh * rune_fiat_weigh
 
-    def print_market_price(self):
+    def print_market_price(self, loop=False):
         depth = self.get_depth()
         thornode_log.debug(f'depth: {depth}')
-        fiat_pair = next(filter(lambda pools: pools["asset"] == self.fiat, depth))
-        rune_fiat_weigh = int(fiat_pair["balance_asset"]) / int(fiat_pair["balance_rune"])
-        thornode_log.debug(f'rune price: {rune_fiat_weigh}')
-        for pool in depth:
-            asset_rune_weigh = int(pool["balance_rune"]) / int(pool["balance_asset"])
-            thornode_log.debug(f'unit {pool["asset"]} weigh {asset_rune_weigh} RUNE in pool')
-            thornode_log.debug(f'fiat value: {asset_rune_weigh * rune_fiat_weigh}')
+        while True:
+            fiat_pair = next(filter(lambda pools: pools["asset"] == self.fiat, depth))
+            rune_fiat_weigh = int(fiat_pair["balance_asset"]) / int(fiat_pair["balance_rune"])
+            thornode_log.debug(f'rune price: {rune_fiat_weigh}')
+            for pool in depth:
+                asset_rune_weigh = int(pool["balance_rune"]) / int(pool["balance_asset"])
+                thornode_log.debug(f'unit {pool["asset"]} weigh {asset_rune_weigh} RUNE in pool')
+                thornode_log.debug(f'fiat value: {asset_rune_weigh * rune_fiat_weigh}')
+            if not loop:
+                break
+            time.sleep(3)
 
     # ----------------- MID GARD AREA ----------------
     def get_action_by_tx(self, tx_id, block_time=1):
