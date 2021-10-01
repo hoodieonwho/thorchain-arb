@@ -28,6 +28,10 @@ pip install siaskynet
 ```python
 pip install midgard_client/
 pip install thornode_client/
+HINT: since the opnapi json isn't completed, sometimes
+the swagger client generated can contain small bugs,
+usually the fix is to change return type of 
+api endpoint from None to Object
 ```
 ## creating mnemonic phrase and store in secret/
 ```python
