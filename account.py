@@ -1,6 +1,7 @@
 import asyncio
 from xchainpy_binance.client import Client as BinanceClient
 from xchainpy_thorchain.client import Client as THORChainClient
+from xchainpy_client.models.tx_types import TxParams
 from xchainpy_client.models.types import Network
 from xchainpy_ethereum.models.client_types import XChainClientParams
 from xchainpy_util.asset import Asset
@@ -8,9 +9,8 @@ from logger import get_logger, logging
 account_log = get_logger("account", level=logging.DEBUG)
 
 
-MNEMONICFILE = open("secret/test_mnemonic", "r").read()
-MNEMONICFILE = "whip pledge together gravity middle puzzle cliff lucky tunnel cousin rather swing attack attract uphold speed leopard position scatter century female elegant need crater"
-params = XChainClientParams(network=Network.Testnet, phrase=MNEMONICFILE)
+MNEMONICFILE = open("secret/mnemonic", "r").read()
+params = XChainClientParams(network=Network.Mainnet, phrase=MNEMONICFILE)
 
 
 # def init_eth():
@@ -37,7 +37,7 @@ def init_bnb():
 
 
 def init_thor():
-    return THORChainClient(phrase=MNEMONICFILE)
+    return THORChainClient(phrase=MNEMONICFILE, network="mainnet")
 
 
 # def init_bch():
@@ -94,8 +94,8 @@ class Account:
         tx = ''
         if asset.chain == 'BNB':
             try:
-                tx = await self.bnb.transfer(asset=asset, amount=amount,
-                                                 recipient=recipient, memo=memo)
+                params = TxParams(asset=asset, amount=amount, recipient=recipient, memo=memo)
+                tx = await self.bnb.transfer(params)
                 account_log.debug(f'TX: {tx}')
             except Exception as e:
                 account_log.debug(f'exception{e}')
@@ -135,7 +135,7 @@ class Account:
 
     async def get_balance(self, asset):
         if asset.chain == 'BNB':
-            balances = await self.bnb.get_balance(asset=asset)
+            balances = await self.bnb.get_balance(asset=asset, address=self.bnb.get_address())
             if balances:
                 account_log.info(f'BNB DEX asset: {balances[0].asset} amount:{balances[0].amount}')
                 return balances[0].amount
@@ -154,3 +154,7 @@ class Account:
         # elif asset.chain == 'LTC':
         #     addr = self.ltc.get_address()
         return addr
+
+    async def purge(self):
+        await self.bnb.purge_client()
+        await self.thor.purge_client()

@@ -6,15 +6,16 @@ import json
 class TestDB:
     @pytest.fixture
     def test_init(self):
-        self.oracle = ThorOracle(["18.214.28.114"])
-        self.test_tx = '7EC0DEA960EA845F732141D8A90E3849816FDCD4F09D8508488AE977ABEF44A6'
+        self.oracle = ThorOracle(network="MCCN")
+        self.test_tx = '8B24F54D21A176B35B25C9F8F3FF6248C30ACA88E5114DA515C492D91259B3CC'
         self.test_thornode_action = self.oracle.get_thornode_tx_detail(tx_id=self.test_tx)
+        print(self.test_thornode_action)
         self.db = DB(cred=open("secret/mongodb", 'r').read())
 
-    # def test_post_action(self, test_init):
-    #     res = self.db.post_action(self.test_thornode_action)
-    #     assert res.acknowledged
-    #
+    def test_post_action(self, test_init):
+        res = self.db.post_action(self.test_thornode_action)
+        assert res.acknowledged
+
     def test_post_filtered_action(self, test_init):
         res = self.db.post_filtered_action(self.test_thornode_action, additional={'expected': 100})
         assert res.acknowledged

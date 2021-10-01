@@ -7,7 +7,7 @@ from collections import defaultdict
 from xchainpy_util.asset import Asset
 from logger import get_logger, logging
 THOR_TRADER_log = get_logger("THOR:TRADER", level=logging.INFO)
-FTX_TRADER_log = get_logger("FTX:TRADER", level=logging.INFO)
+FTX_TRADER_log = get_logger("FTX:TRADER", level=logging.DEBUG)
 import ccxt.async_support as ccxt
 from ccxt.base.errors import RequestTimeout
 from ccxt.base.decimal_to_precision import decimal_to_precision, number_to_string, TRUNCATE
@@ -91,9 +91,9 @@ class FTXTrader:
                 book = await self.account.fetch_order_book(pair, depth)
                 bids = await self.get_book(book['bids'], depth, threshold)
                 asks = await self.get_book(book['asks'], depth, threshold)
-                FTX_TRADER_log.debug(f'pair: {pair} '
-                                     f'bids: {bids} '
-                                     f'asks: {asks} \n')
+                # FTX_TRADER_log.info(f'pair: {pair} '
+                #                      f'bids: {bids} '
+                #                      f'asks: {asks} \n')
                 return bids, asks
             except RequestTimeout as e:
                 FTX_TRADER_log.debug('Request timeout calling self.ftx.fetch_order_book: {e}')
@@ -122,15 +122,15 @@ class FTXTrader:
 
     async def estimate_swap_output(self, pair, amount, side, depth=10):
         bids, asks = await self.get_depth(pair, depth, amount*1.5)
-        FTX_TRADER_log.debug(f'estimating output for pair: {pair} '
-                            f'direction {side}\n')
+        FTX_TRADER_log.debug(f'estimating output for pair: {pair}'
+                             f' {side} {amount}')
         if side == 'buy':
             o_price = asks[0]
             o_volume = asks[1]
             for i in range(depth):
-                if o_volume[i] > amount:
+                if o_volume[i] > amount / o_price[i]:
                     output = amount / o_price[i]
-                    FTX_TRADER_log.info(f'{amount} {pair.split("/")[0]} = {output} {pair.split("/")[1]}')
+                    FTX_TRADER_log.info(f'{amount} {pair.split("/")[1]} = {output} {pair.split("/")[0]}')
                     return output
             return 0
         elif side == 'sell':
@@ -198,17 +198,13 @@ class THORTrader:
             f'memo: {memo}\n'
             f'in_tx: {in_tx}'
         )
-        old_amount = 0
-        for b in await self.account.bnb.get_balance(address=self.account.bnb.get_address()):
-            if b.asset.symbol !="BNB":
-                old_amount = b.amount
-                print(f"old: {b.asset} : {b.amount}")
-        new_amount = 0
-        while float(new_amount) <= float(old_amount):
-            for b in await self.account.bnb.get_balance(address=self.account.bnb.get_address()):
-                if b.asset.symbol != "BNB":
-                    new_amount = b.amount
-                    print(float(b.amount) - float(old_amount))
+        old_balance = await self.account.get_balance(asset=in_asset)
+        new_balance = 0
+        while float(new_balance) <= float(old_balance):
+            new_balance = await self.account.get_balance(asset=in_asset)
+            if float(new_balance) > float(old_balance):
+                print(new_balance)
+                break
         in_tx_detail = self.oracle.get_thornode_tx_detail(tx_id=in_tx, block_time=self.oracle.BLOCKTIME[in_asset.chain])
         if in_tx_detail:
             out_tx = in_tx_detail["out_hashes"]

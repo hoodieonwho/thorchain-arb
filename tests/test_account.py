@@ -10,6 +10,5 @@ from trader import THORTrader
 T = THORTrader(host=["138.197.48.59", "34.212.187.195"],network="MCCN")
 loop = asyncio.get_event_loop()
 loop.run_until_complete(T.account.statement())
-loop.run_until_complete(T.account.bnb.purge_client())
-T.account.thor.purge_client()
+loop.run_until_complete(T.account.purge())
 loop.close()

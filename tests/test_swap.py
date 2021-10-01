@@ -9,39 +9,33 @@ from trader import THORTrader
 from xchainpy_util.asset import Asset
 
 
-def thor_ops_handler(params):
+def thor_ops_handler(params, type):
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(thor_ops(**params))
+    if type == "single":
+        loop.run_until_complete(single(**params))
     loop.close()
 
 
-async def thor_ops(network, unit_asset):
-    unit_asset = Asset.from_str(unit_asset)
-    # Trading
-    thor = THORTrader(network=network, host=["18.184.61.252"])
-
-    # Account Statement
+async def single(network, asset1, asset2):
+    thor = THORTrader(network=network)
     await thor.account.statement()
     bnb_add = thor.account.bnb.get_address()
-    for b in await thor.account.bnb.get_balance(address=bnb_add):
-        print(f"{b.asset} : {b.amount}")
-    # hash = await thor.account.thor.deposit(amount=10*10**8, asset=unit_asset,
-    #                                        memo=f"=:BNB.BNB:{bnb_add}")
-    expected = thor.estimate_swap_output(in_amount=300, in_asset=unit_asset, out_asset=Asset.from_str("BNB.BUSD-74E"))
+    asset1_balance = await thor.account.get_balance(asset=asset1)
+    expected = thor.estimate_swap_output(in_amount=float(asset1_balance),
+                                         in_asset=asset1, out_asset=asset2)
     print(expected)
-    hash = await thor.swap(in_amount=300, in_asset=unit_asset, out_asset=Asset.from_str("BNB.BUSD-74E"),
-                           wait=False)
+    hash = await thor.swap(in_amount=float(asset1_balance), in_asset=asset1, out_asset=asset2, wait=True)
     print(hash)
-    for b in await thor.account.bnb.get_balance(address=bnb_add):
-        print(f"{b.asset} : {b.amount}")
-    await thor.account.bnb.purge_client()
-    await thor.account.thor.purge_client()
+    await thor.account.purge()
 
 
 def main():
-    rune = {'network': 'MCTN', 'unit_asset':'THOR.RUNE'}
-    thor_side = Process(target=thor_ops_handler(rune))
-    thor_side.start()
+    asset1 = Asset.from_str("BNB.ETH-1C9")
+    asset2 = Asset.from_str("BNB.BUSD-BD1")
+    yi_1 = {'network': 'MCCN', "asset1": asset1, "asset2": asset2}
+
+    test_single1 = Process(target=thor_ops_handler(yi_1, type="single"))
+
 
 
 if __name__ == "__main__":

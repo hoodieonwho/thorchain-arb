@@ -6,12 +6,15 @@ class DB:
     def __init__(self, cred):
         self.client = MongoClient(cred)
         self.db = self.client.arb
-        self.thortrader = self.db.ltc_logs
-        self.ftxtrader = self.db.ltc_trading
-        self.profile = self.db.ltc_balance
+        self.balance = self.db.balance
+        self.jobs = self.db.jobs
+
+    def post_job(self, job):
+        result = self.jobs.insert_one(job)
+        return result
 
     def post_balance(self, balance):
-        result = self.profile.insert_one(balance)
+        result = self.balance.insert_one(balance)
 
     def post_action(self, action):
         result = self.thortrader.insert_one(action)
