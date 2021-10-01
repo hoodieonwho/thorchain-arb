@@ -44,7 +44,7 @@ mkdir secret/
 python utils/thorchain_mnemonic.py
 ```
 `ls secret/` returns `real_mnemonic`
-### issue with 12 words mnemonic
+### (Not sure of the status, 12 words should be fine for now)issue with 12 words mnemonic
 xchainpy_binance module has problem with 12 words mnemonic, using 24 words for now.
 ``python
 words = Mnemonic(language).generate(strength=256)
