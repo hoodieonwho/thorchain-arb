@@ -15,6 +15,9 @@ if this repo ended up helping you, feel free to donate:
 
 # Installing Dependencies
 ## update midgard and thornode api client
+midgard api client isn't being supported currently,
+you can download the openapi json directly at
+"https://midgard.thorchain.info/v2/doc"
 I am using siaskynet as a decentralized cloud for uploading swagger client
 ```python
 pip install siaskynet
@@ -44,10 +47,8 @@ words = Mnemonic(language).generate(strength=256)
 ``
 ### thorchain deposit function not available
 ## install xchainpy module
-currently using testnet ethereum module
 ```python
-pip install -i https://test.pypi.org/simple/ xchainpy-ethereum
-pip install xchainpy_bitcoin xchainpy_bitcoincash xchainpy_binance xchainpy_litecoin xchainpy_thorchain xchainpy_util
+pip install xchainpy_ethereum xchainpy_bitcoin xchainpy_bitcoincash xchainpy_binance xchainpy_litecoin xchainpy_thorchain xchainpy_util
 
 ```
 ### tips
