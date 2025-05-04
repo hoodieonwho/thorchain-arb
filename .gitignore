@@ -11,3 +11,6 @@ venv/
 dist/
 numpy/
 *.zip
+
+midgard-public-api-client/
+thornode-api-client/
