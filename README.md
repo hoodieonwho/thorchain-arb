@@ -1,8 +1,12 @@
 # Recent Update
-This repo is in progress, I was able to already arb between ftx and thorchain MCCN using BUSD as a base asset.
-This arb is not ready for public use, you must understand the code in order to use it, this can serve
-as a basis for people who want to develop arb bots.
-I will be making updates to this repo constantly.
+This repo has been updated with improved API client generation. Key updates include:
+
+- **New API Client Generation Process**: Replaced the outdated client generation with a more reliable method
+- **Fixed OpenAPI YAML Files**: Added scripts to fix issues in the Thorchain OpenAPI specifications
+- **Better Documentation**: Updated instructions for client generation and installation
+
+The repo can still be used for arbitrage between exchanges and Thorchain MCCN using various assets as a base.
+This arbitrage solution is not ready for public use without understanding the code first. It can serve as a basis for those developing arbitrage bots.
 
 Donation:
 if this repo ended up helping you, feel free to donate:
@@ -10,25 +14,65 @@ if this repo ended up helping you, feel free to donate:
 
 
 # Installing Dependencies
-## update midgard and thornode api client
-midgard api client isn't being supported currently,
-you can download the openapi json directly at
-"https://midgard.thorchain.info/v2/doc"
-I am using siaskynet as a decentralized cloud for uploading swagger client
-```python
-pip install siaskynet
-```
+## Update midgard and thornode API clients
+
+### 1. Fetch OpenAPI Specifications
+Use the `fetch_openapi.py` script to download the latest OpenAPI YAML files from GitLab:
+
 ```bash
-(cd script/ && python init_api_client.py)
+# Download Thornode OpenAPI spec
+python script/fetch_openapi.py thornode
+
+# Download Midgard OpenAPI spec
+python script/fetch_openapi.py midgard
+
+# Or download both at once
+python script/fetch_openapi.py both
 ```
-```python
-pip install midgard_client/
-pip install thornode_client/
-HINT: since the opnapi json isn't completed, sometimes
-the swagger client generated can contain small bugs,
-usually the fix is to change return type of 
-api endpoint from None to Object
+
+### 2. Fix the Thornode API Spec
+The Thornode OpenAPI spec requires fixes before it can be used to generate a client:
+
+```bash
+# Fix HTTP response codes in the YAML file
+python script/fix_thornode_yaml_response.py script/thornode.yaml
+
+# Fix schema references in the YAML file
+python script/fix_thornode_yaml_schema_refs.py script/thornode.yaml
 ```
+
+### 3. Generate and Install API Clients
+Install the OpenAPI Python Client generator:
+
+```bash
+pip install openapi-python-client
+```
+
+Generate client code:
+
+```bash
+# Generate Thornode client
+openapi-python-client generate --path script/thornode.yaml
+
+# Generate Midgard client
+openapi-python-client generate --path script/midgard.yaml
+```
+
+Install the generated clients:
+
+```bash
+pip install -e thornode-api-client/
+pip install -e midgard-public-api-client/
+```
+
+### 4. Test the Clients with Pool Viewer
+Once the clients are installed, you can test them using the pool viewer script:
+
+```bash
+python script/pool_viewer.py
+```
+
+This script demonstrates how to retrieve pool information from THORChain using the API clients.
 ## creating mnemonic phrase and store in secret/
 ```python
 pip install mnemonic
