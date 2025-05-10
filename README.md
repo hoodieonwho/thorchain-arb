@@ -10,7 +10,7 @@ This arbitrage solution is not ready for public use without understanding the co
 
 Donation:
 if this repo ended up helping you, feel free to donate:
-- THOR.RUNE: thor194dh5grmq405kvajtfylvkc4639frzkwu38r7p
+- THOR.RUNE: thor1uk7gnypj43z83m4uu94qn7vcwmj2estse0j2wk
 
 
 # Installing Dependencies
