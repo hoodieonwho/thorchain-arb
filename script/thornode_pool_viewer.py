@@ -68,6 +68,40 @@ def get_pool_details(asset: str, base_url: str = _THORNODE_URL) -> Optional[Pool
     return response.parsed
 
 
+def calculate_price_impact(pool: Pool, swap_amount_usd: float, rune_usd_price: float) -> float:
+    """
+    Calculate the price impact for a given USD swap amount
+    
+    Args:
+        pool: The pool to calculate impact for
+        swap_amount_usd: Amount in USD to simulate swapping
+        rune_usd_price: Current RUNE price in USD
+        
+    Returns:
+        Price impact as a percentage
+    """
+    # Convert USD amount to RUNE
+    swap_amount_rune = swap_amount_usd / rune_usd_price
+    
+    # Convert RUNE to base units (e8)
+    swap_amount_rune_e8 = swap_amount_rune * 1e8
+    
+    # Get pool depths
+    x = Decimal(pool.balance_rune)  # Current RUNE in pool
+    Y = Decimal(pool.balance_asset)  # Current asset in pool
+    
+    # The amount being added to the pool
+    X = Decimal(swap_amount_rune_e8)
+    
+    # Calculate slip based on the formula: slip = X/(x+X)
+    slip = X / (x + X)
+    
+    # Price impact as a percentage
+    price_impact = float(slip) * 100
+    
+    return price_impact
+
+
 def display_pool_info(pools: List[Pool]):
     """
     Display essential information about pools
@@ -76,12 +110,24 @@ def display_pool_info(pools: List[Pool]):
         pools: List of pool details to display
     """
     print(f"Total pools: {len(pools)}")
-    print("-" * 90)
-    print(f"{'Asset':<15} {'Asset Depth':<15} {'Rune Depth':<15} {'Price (RUNE)':<15} {'Status':<10} {'Pool Units':<15}")
-    print("-" * 90)
+    print("-" * 130)  # Increased width for the new columns
+    print(f"{'Asset':<15} {'Asset Depth':<15} {'Rune Depth':<15} {'Price (RUNE)':<15} {'Price (USD)':<15} {'Impact (1M USD)':<15} {'Status':<10} {'Pool Units':<15}")
+    print("-" * 130)  # Increased width for the new columns
     
-    # Sort pools by balance asset (liquidity) in descending order
-    sorted_pools = sorted(pools, key=lambda p: int(p.balance_asset), reverse=True)
+    # Sort pools by Rune depth (liquidity) in descending order
+    sorted_pools = sorted(pools, key=lambda p: int(p.balance_rune), reverse=True)
+    
+    # Calculate RUNE price in USD using the deepest USD pool
+    rune_usd_price = 0
+    usd_pools = [p for p in pools if p.status == "Available" and 
+                 (p.asset.split('.')[1].startswith("USDT") or 
+                  p.asset.split('.')[1].startswith("USDC") or 
+                  p.asset.split('.')[1].startswith("USD"))]
+    
+    if usd_pools:
+        reference_pool = max(usd_pools, key=lambda p: int(p.balance_rune))
+        pool_rune_per_asset = int(reference_pool.balance_rune) / int(reference_pool.balance_asset)
+        rune_usd_price = 1 / pool_rune_per_asset
     
     for pool in sorted_pools:
         # Format numbers for better readability
@@ -90,14 +136,21 @@ def display_pool_info(pools: List[Pool]):
         
         # Calculate price (RUNE per asset)
         if int(pool.balance_asset) > 0:
-            price = int(pool.balance_rune) / int(pool.balance_asset)
+            price_in_rune = int(pool.balance_rune) / int(pool.balance_asset)
+            # Calculate USD price if we have RUNE USD price
+            price_in_usd = price_in_rune * rune_usd_price if rune_usd_price > 0 else 0
+            
+            # Calculate price impact for a 1 million USD swap
+            price_impact = calculate_price_impact(pool, 10000, rune_usd_price) if rune_usd_price > 0 else 0
         else:
-            price = 0
+            price_in_rune = 0
+            price_in_usd = 0
+            price_impact = 0
         
         # Get pool status
         status = pool.status
         
-        print(f"{pool.asset:<15} {asset_depth:<15.2f} {rune_depth:<15.2f} {price:<15.6f} {status:<10} {pool.pool_units:<15}")
+        print(f"{pool.asset:<15} {asset_depth:<15.2f} {rune_depth:<15.2f} {price_in_rune:<15.6f} {price_in_usd:<15.6f} {price_impact:<15.2f}% {status:<10} {pool.pool_units:<15}")
 
 
 def calculate_swap_output(input_amount: Decimal, input_pool: Pool, output_pool: Pool, is_input_rune: bool = False) -> Decimal:
@@ -159,16 +212,22 @@ def find_swap_opportunities(pools: List[Pool]):
     pool_map = {p.asset: p for p in active_pools}
     
     # Use USD pool as reference for pricing if available
-    usd_pools = [p for p in active_pools if p.asset.endswith(".USDT") or p.asset.endswith(".USDC") or p.asset.endswith(".BUSD")]
+
+    usd_pools = [p for p in active_pools if p.asset.split('.')[1].startswith("USDT") or p.asset.split('.')[1].startswith("USDC") or p.asset.split('.')[1].startswith("USD")]
+    
     if not usd_pools:
         print("No USD pools found for price reference")
         return
     
     # Use the deepest USD pool as the reference
     reference_pool = max(usd_pools, key=lambda p: int(p.balance_rune))
-    rune_usd_price = int(reference_pool.balance_asset) / int(reference_pool.balance_rune)
     
-    print(f"Reference: 1 RUNE = ${1/rune_usd_price:.4f} USD (via {reference_pool.asset})")
+    # Calculate RUNE price in USD by taking the inverse of RUNE/USD price
+    # For example, if RUNE/USD = 0.67, then USD/RUNE = 1/0.67 ≈ 1.49
+    pool_rune_per_asset = int(reference_pool.balance_rune) / int(reference_pool.balance_asset)
+    rune_usd_price = 1 / pool_rune_per_asset
+    
+    print(f"Reference: 1 RUNE = ${rune_usd_price:.4f} USD (via {reference_pool.asset})")
     print("-" * 90)
     
     # Compare assets across different chains
