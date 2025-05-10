@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Thornode API
-  version: 3.5.1
+  version: 3.5.2
   contact:
     email: devs@thorchain.org
   description: Thornode REST API.
